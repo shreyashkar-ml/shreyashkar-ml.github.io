@@ -1,6 +1,6 @@
 ---
 title: "Decoding Karpathy's min-char-rnn (character level Recurrent Neural Network)"
-date: 2024-09-22
+date: 2024-10-05
 draft: false
 math: true
 toc: true
