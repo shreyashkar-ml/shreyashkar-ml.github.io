@@ -39,7 +39,7 @@ where, $ h_{t-1} $ represents the hidden state input from previous states, $ b_h
 RNNs are particularly effective in tasks like language modeling, machine translation, etc. where the context of previous characters are crucial for predicting the next one.
 
 Now, let's work through min-char-rnn code one-step at a time:
-### `lossFun` Function:
+### `lossFun` Function
 This function runs both forward and backward passes through the RNN and computes the loss and gradients.
 
 ```python
@@ -174,7 +174,7 @@ $$
 dhnext = np.dot(Whh.T, dhraw)
 ```
 
-#### Summary:
+#### Summary
 - **Step 1:** Compute gradient of the loss w.r.t the output probabilities.
 - **Step 2:** Calculate the gradients for the weights and biases connecting hidden states to outputs.
 - **Step 3:** Propagate the gradient through the hidden state, taking into account the contribution from the next time step.
