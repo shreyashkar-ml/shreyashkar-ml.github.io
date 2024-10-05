@@ -17,7 +17,7 @@ We'll be going through the steps one-by-one, mainly focusing on backpropagation 
 ## **Overview of RNN**
 Recurrent Neural Networks are at the core an attempt to develop an internal structure that is appropriate for a particular task domain using internal 'hidden' units which are not part of the input or output vectors.
 
-Learning becomes more interesting but more difficult when we introduce hidden units whose actual desired states are not specified by the task. The simplest for of the learning procedure is for layered networks which have a layer of inputs at the bottom; any number of intermediate layers; and a layer of output units at the top.
+Learning becomes more interesting but more difficult when we introduce hidden units whose actual desired states are not specified by the task. The simplest form of the learning procedure is for layered networks which have a layer of inputs at the bottom; any number of intermediate layers; and a layer of output units at the top.
 
 An input vector is presented to the network by setting the states of the input units.
 
