@@ -1,0 +1,79 @@
+baseURL = "https://shreyashkar-ml.github.io"
+languageCode = "en-us"
+title = "Shreyashkar Lal Sahu"
+subtitle = "Data Scientist and ML Enthusiast"
+theme = "PaperMod"
+
+# PaperMod specific parameters
+defaultTheme = "auto"
+ShowReadingTime = true
+ShowShareButtons = true
+ShowPostNavLinks = true
+ShowBreadCrumbs = true
+ShowCodeCopyButtons = true
+ShowToc = true
+TocOpen = true
+
+# LaTeX support
+math = true
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+    [markup.goldmark.parser]
+      wrapStandAloneImageWithinParagraph = false
+      [markup.goldmark.parser.attribute]
+        block = true
+
+[menu]
+  [[menu.main]]
+    identifier = "about"
+    name = "About"
+    url = "/about/"
+    weight = 20
+  [[menu.main]]
+    identifier = "blogs"
+    name = "Blogs"
+    url = "/posts/"
+    weight = 10
+  [[menu.main]]
+    identifier = "code"
+    name = "Code"
+    url = "/code/"
+    weight = 30
+
+[params]
+  # Add your title and subtitle
+  title = "Shreyashkar Lal Sahu"
+  subtitle = "Data Scientist and ML Enthusiast"
+
+  # Enable profile mode to show social icons
+  [params.profileMode]
+    enabled = true
+    title = "Shreyashkar Lal Sahu"
+    subtitle = "Data Scientist and ML Enthusiast"
+
+  # Social icons
+  [[params.socialIcons]]
+    name = "twitter"
+    url = "https://twitter.com/ShreyashkarLal"
+  [[params.socialIcons]]
+    name = "github"
+    url = "https://github.com/Shreyash-0699"
+  [[params.socialIcons]]
+    name = "linkedin"
+    url = "https://www.linkedin.com/in/shreyashkar-lal/"
+
+  [[params.profileMode.buttons]]
+    name = "About"
+    url = "/about/"
+
+  [[params.profileMode.buttons]]
+    name = "Blogs"
+    url = "/posts/"
+
+  [[params.profileMode.buttons]]
+    name = "Code"
+    url = "/code/"
+

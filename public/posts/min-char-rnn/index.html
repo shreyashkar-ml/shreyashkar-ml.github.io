@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Decoding Karpathy&#39;s min-char-rnn (character level Recurrent Neural Network) | Shreyashkar Lal Sahu</title>
+<meta name="keywords" content="">
+<meta name="description" content="Recurrent Neural Networks (RNN) have existed for long at this point, and RNNs without attention mechanism (plain-simple RNN architecture) are no longer the hottest thing either.
+Still, RNN represents one of the first step towards understanding training for sequential data input, where the context of previous inputs are crucial for predicting the next output.
+Karpathy&rsquo;s introduction to the The Unreasonable Effectiveness of Recurrent Neural Networks along with the attached Character Level RNN are among the best resources to get started with RNN. However, as I progressed my way through the implementation of min-char-rnn, I realized that while the blogpost suffices for an intuitive understanding of RNN, and the code works through the implementation from scratch, a lot of heavy-lifting in terms of manual backpropagation implementation, and flow of gradient during training to update the weights and parameters of the models are left for the readers to understand on their own.">
+<meta name="author" content="">
+<link rel="canonical" href="https://shreyashkar-ml.github.io/posts/min-char-rnn/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.540a45df161a81442ed9688639fd689ef2b3aec61c49f8e5b580f079278f4c4a.css" integrity="sha256-VApF3xYagUQu2WiGOf1onvKzrsYcSfjltYDweSePTEo=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://shreyashkar-ml.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://shreyashkar-ml.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://shreyashkar-ml.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://shreyashkar-ml.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://shreyashkar-ml.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://shreyashkar-ml.github.io/posts/min-char-rnn/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ]
+        });
+    });
+</script>
+
+
+
+
+<link rel="stylesheet" href="/css/extended/custom.min.css"><meta property="og:title" content="Decoding Karpathy&#39;s min-char-rnn (character level Recurrent Neural Network)" />
+<meta property="og:description" content="Recurrent Neural Networks (RNN) have existed for long at this point, and RNNs without attention mechanism (plain-simple RNN architecture) are no longer the hottest thing either.
+Still, RNN represents one of the first step towards understanding training for sequential data input, where the context of previous inputs are crucial for predicting the next output.
+Karpathy&rsquo;s introduction to the The Unreasonable Effectiveness of Recurrent Neural Networks along with the attached Character Level RNN are among the best resources to get started with RNN. However, as I progressed my way through the implementation of min-char-rnn, I realized that while the blogpost suffices for an intuitive understanding of RNN, and the code works through the implementation from scratch, a lot of heavy-lifting in terms of manual backpropagation implementation, and flow of gradient during training to update the weights and parameters of the models are left for the readers to understand on their own." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://shreyashkar-ml.github.io/posts/min-char-rnn/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-09-22T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-09-22T00:00:00+00:00" /><meta property="og:site_name" content="Shreyashkar Lal Sahu" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Decoding Karpathy&#39;s min-char-rnn (character level Recurrent Neural Network)"/>
+<meta name="twitter:description" content="Recurrent Neural Networks (RNN) have existed for long at this point, and RNNs without attention mechanism (plain-simple RNN architecture) are no longer the hottest thing either.
+Still, RNN represents one of the first step towards understanding training for sequential data input, where the context of previous inputs are crucial for predicting the next output.
+Karpathy&rsquo;s introduction to the The Unreasonable Effectiveness of Recurrent Neural Networks along with the attached Character Level RNN are among the best resources to get started with RNN. However, as I progressed my way through the implementation of min-char-rnn, I realized that while the blogpost suffices for an intuitive understanding of RNN, and the code works through the implementation from scratch, a lot of heavy-lifting in terms of manual backpropagation implementation, and flow of gradient during training to update the weights and parameters of the models are left for the readers to understand on their own."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Blogs",
+      "item": "https://shreyashkar-ml.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Decoding Karpathy's min-char-rnn (character level Recurrent Neural Network)",
+      "item": "https://shreyashkar-ml.github.io/posts/min-char-rnn/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Decoding Karpathy's min-char-rnn (character level Recurrent Neural Network)",
+  "name": "Decoding Karpathy\u0027s min-char-rnn (character level Recurrent Neural Network)",
+  "description": "Recurrent Neural Networks (RNN) have existed for long at this point, and RNNs without attention mechanism (plain-simple RNN architecture) are no longer the hottest thing either.\nStill, RNN represents one of the first step towards understanding training for sequential data input, where the context of previous inputs are crucial for predicting the next output.\nKarpathy\u0026rsquo;s introduction to the The Unreasonable Effectiveness of Recurrent Neural Networks along with the attached Character Level RNN are among the best resources to get started with RNN. However, as I progressed my way through the implementation of min-char-rnn, I realized that while the blogpost suffices for an intuitive understanding of RNN, and the code works through the implementation from scratch, a lot of heavy-lifting in terms of manual backpropagation implementation, and flow of gradient during training to update the weights and parameters of the models are left for the readers to understand on their own.\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "Recurrent Neural Networks (RNN) have existed for long at this point, and RNNs without attention mechanism (plain-simple RNN architecture) are no longer the hottest thing either.\nStill, RNN represents one of the first step towards understanding training for sequential data input, where the context of previous inputs are crucial for predicting the next output.\nKarpathy’s introduction to the The Unreasonable Effectiveness of Recurrent Neural Networks along with the attached Character Level RNN are among the best resources to get started with RNN. However, as I progressed my way through the implementation of min-char-rnn, I realized that while the blogpost suffices for an intuitive understanding of RNN, and the code works through the implementation from scratch, a lot of heavy-lifting in terms of manual backpropagation implementation, and flow of gradient during training to update the weights and parameters of the models are left for the readers to understand on their own.\nWe’ll be going through the steps one-by-one, mainly focusing on backpropagation calculation in detail to understand the behind-the-hood working of RNN.\nOverview of RNN Recurrent Neural Networks are at the core an attempt to develop an internal structure that is appropriate for a particular task domain using internal ‘hidden’ units which are not part of the input or output vectors.\nLearning becomes more interesting but more difficult when we introduce hidden units whose actual desired states are not specified by the task. The simplest for of the learning procedure is for layered networks which have a layer of inputs at the bottom; any number of intermediate layers; and a layer of output units at the top.\nAn input vector is presented to the network by setting the states of the input units.\nThen the stats of the units in each layer are determined by applying steps as followed for input vector $ x_t $ :\nHidden State Calculation: $ h_t = \\tanh(W_{xh} \\cdot x_t + W_{hh} \\cdot h_{t-1} + b_h) $\nOutput and Softmax: $ y_t = W_{hy} \\cdot h_t + b_y $ $ p_t = \\frac{ \\exp(y_t) }{ \\sum exp(y_t) } $ where, $ h_{t-1} $ represents the hidden state input from previous states, $ b_h $ represents the biased term in hidden state calculation, and $ p_t $ represents the softmax output from the output vector $ y_t $.\nAn illustration of character level RNN from Andrej Karpathy’s blogpost\nRNNs are particularly effective in tasks like language modeling, machine translation, etc. where the context of previous characters are crucial for predicting the next one.\nNow, let’s work through min-char-rnn code one-step at a time:\nlossFun Function: This function runs both forward and backward passes through the RNN and computes the loss and gradients.\ndef lossFun(inputs, targets, hprev): \"\"\" Runs forward and backward passes through the RNN. inputs, targets: Lists of integers. For some i, inputs[i] is the input character (encoded as an index to the ix_to_char map) and targets[i] is the corresponding next character in the training data (similarly encoded). hprev: Hx1 array of initial hidden state. returns: loss, gradients on model parameters, and last hidden state. \"\"\" Inputs:\ninputs: Indices representing the input characters. targets: Indices representing the next characters in the sequence hprev: Initial hidden state from the previous sequence Outputs:\nloss: Cross-entropy loss Gradients for the weights and biases (dWxh, dWhh, dWhy, dbh, dby) The last hidden state (hs[len(inputs)-1]) Forward Pass The forward pass computes the hidden states and the outputs at each time step.\n# Initialize storage for variables needed for forward and backward passes xs, hs, ys, ps = {}, {}, {}, {} hs[-1] = np.copy(hprev) # Initialize with the given hidden state loss = 0 For each time step $ t $:\nInput Encoding: The input characters are converted into one-hot encoding vectors for input into the model. xs[t] = np.zeros((vocab_size, 1)) # one-hot encoding xs[t][inputs[t]] = 1 Hidden State Calculation: The hidden states to capture the task information and develop/emulate an internal structure is computed using: $$ h_t = \\tanh(W_{xh}\\cdot x_t + W_{hh} \\cdot h_{t-1} + b_h) $$ hs[t] = np.tanh(np.dot(Wxh, xs[t]) + np.dot(Whh, hs[t-1]) + bh) Output and Softmax: We first calculate the unnormalized scores (ys[t]) and then converet those into softmax probabilities (ps[t]) for output: $$ y_t = W_{hy} \\cdot h_t + b_y $$ $$ p_t = \\frac{\\exp(y_t)}{\\sum \\exp(y_t)} $$ ys[t] = np.dot(Why, hs[t]) + by ps[t] = np.exp(ys[t]) / np.sum(np.exp(ys[t])) Loss Calculation: The cross-entropy loss at each time step is then added up using: loss += -np.log(ps[t][targets[t],0]) Backpropagation through time (BPTT) Gradient of Loss w.r.t Softmax Output (ps[t]): For each time step t: The loss at time step $ t $ is given by: $$ Loss_t = - \\log(p_{t,target}) $$ The derivative of the loss w.r.t softmax probabilities $p_t$ is: $$ \\frac{\\partial Loss_t}{\\partial p_t} = p_t - 1_{target} $$ Where: $ p_t $ is the softmax probability vector at time step t. $ 1_{target} $ is a one-hot vector with a 1 at the index of the target character. dy = np.copy(ps[t]) dy[targets[t]] -= 1 Gradient w.r.t Output Weights (Why) and Bias (by): The output $ y_t $ at each time step is computed as: $$ y_t = W_{hy} \\cdot h_t + b_y $$ The gradients of the loss w.r.t the weights and biases are given by: $$ \\frac{ \\partial Loss_t }{\\partial W_{hy}} = \\sum_t \\left(\\frac{ \\partial Loss_t }{ \\partial y_t } \\cdot \\frac{ \\partial y_t }{ \\partial W_{hy}} \\right)= \\sum_t( p_t - 1_{target}).h_t^T $$ $$ \\frac {\\partial Loss_t }{\\partial b_y} = \\sum_t(p_t - 1_{target}) $$ dWhy += np.dot(dy, hs[t].T) dby += dy Gradient w.r.t Hidden State (h_t): To backpropagate into the hidden state, we need to account for both the current time step’s gradient and the incoming gradient from the next time step: $$ \\frac{ \\partial Loss_t }{\\partial h_t} = W_{hy}^T \\cdot \\frac{\\partial Loss_t}{ \\partial y_t} + \\frac{\\partial Loss_{t+1}}{\\partial h_t} $$ Where: $ \\frac{\\partial Loss_{t+1}}{\\partial h_t} $ is the gradient passed back from the next time step. dh = np.dot(Why.T, dy) + dhnext Gradient w.r.t Activation Function (tanh): The hidden state is computed using the $ tanh $ activation function: $$ h_t = \\tanh(W_{xh} \\cdot x_t + W_{hh} \\cdot h_{t-1} + b_h) $$ The input to the tanh activation function is: $$ a_t = W_{xh} \\cdot x_t + W_{hh} \\cdot h_{t-1} + b_h $$ The gradient through the $ tanh $ function is: $$ dhraw = \\frac{\\partial Loss_t}{\\partial a_t} = \\frac{ \\partial Loss_t }{\\partial ({W_{xh} \\cdot x_t + W_{hh} \\cdot h_{t-1} + b_h })} = (1 - h_{t}^2) \\odot \\frac{ \\partial Loss_t }{\\partial h_t} $$ Here, $ (1-h_t^2) $ is the derivative of $ tanh(h_t) $. dhraw = (1- hs[t]*hs[t]) * dh Gradient w.r.t Input Weights (Wxh), Hidden Weights (Whh), and Hidden Bias (bh): Now, compute the gradients w.r.t weights and biases connecting the inputs and hidden states: The input to the tanh activation function is: $$ a_t = W_{xh} \\cdot x_t + W_{hh} \\cdot h_{t-1} + b_h $$ For input-to-hidden weights $ W_{xh} $: $$ \\frac{\\partial Loss_t}{\\partial W_{xh}} = \\sum_t \\left(\\frac{\\partial Loss_t}{\\partial a_t} \\cdot \\frac{\\partial a_t}{\\partial W_{xh}} \\right)= \\sum_t \\left(\\text{dhraw} \\cdot x_t^T \\right) $$ For hidden-to-hidden weights $ W_{hh} $: $$ \\frac{\\partial Loss_t}{\\partial W_{hh}} = \\sum_t \\left(\\frac{ \\partial Loss_t}{\\partial a_t} \\cdot \\frac{ \\partial a_t }{\\partial W_{hh}} \\right) = \\sum_t (\\text{dhraw} \\cdot h_{t-1}^T) $$ For hidden bias $ b_h $: $$ \\frac{\\partial Loss_t}{\\partial b_h} = \\sum_t \\frac{\\partial Loss}{\\partial a_t} = \\sum_tdhraw $$ dbh += dhraw dWxh += np.dot(dhraw, xs[t].T) dWhh += np.dot(dhraw, hs[t-1].T) Gradient Propagation to Previous Time Step (dhnext): Propogate the gradient back to the previous time step: $$ \\frac{ \\partial Loss_t}{\\partial h_{t-1}} = W_{hh}^T \\cdot \\frac{\\partial Loss_t}{\\partial a_t} = W_{hh}^T \\cdot dhraw $$ dhnext = np.dot(Whh.T, dhraw) Summary: Step 1: Compute gradient of the loss w.r.t the output probabilities. Step 2: Calculate the gradients for the weights and biases connecting hidden states to outputs. Step 3: Propagate the gradient through the hidden state, taking into account the contribution from the next time step. Step 4: Backpropagate through the $ tanh $ activation function. Step 5: Compute the gradients w.r.t the weights and biases connecting the inputs and hidden states, as well as the hidden-to-hidden weights. Step 6: Propagate the gradient back to the previous time step’s hidden state. These steps iteratively update the gradient accumulations by iterating backward through the time steps of the sequence.\nNow, with all the heavy-lifting stuffs taken care of, I think understanding RNNs in-depth would be a lot easier than before. Here’s the min-char-rnn code commented and explained a bit more in details to work through the code without losing the touch with explanation.\nReferences Learning representations by backpropagating errors The Unreasonable Effectiveness of Recurrent Neural Networks Character Level RNN Tutorial on Recurrent Neural Networks A Nice in-depth walkthrough of Character RNN RNN Illustrations ",
+  "wordCount" : "1444",
+  "inLanguage": "en",
+  "datePublished": "2024-09-22T00:00:00Z",
+  "dateModified": "2024-09-22T00:00:00Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://shreyashkar-ml.github.io/posts/min-char-rnn/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Shreyashkar Lal Sahu",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://shreyashkar-ml.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://shreyashkar-ml.github.io/" accesskey="h" title="Shreyashkar Lal Sahu (Alt + H)">Shreyashkar Lal Sahu</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://shreyashkar-ml.github.io/posts/" title="Blogs">
+                    <span>Blogs</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://shreyashkar-ml.github.io/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://shreyashkar-ml.github.io/code/" title="Code">
+                    <span>Code</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Decoding Karpathy&#39;s min-char-rnn (character level Recurrent Neural Network)
+    </h1>
+    <div class="post-meta"><span title='2024-09-22 00:00:00 +0000 UTC'>September 22, 2024</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>Recurrent Neural Networks (RNN) have existed for long at this point, and RNNs without attention mechanism (plain-simple RNN architecture) are no longer the hottest thing either.</p>
+<p>Still, RNN represents one of the first step towards understanding training for sequential data input, where the context of previous inputs are crucial for predicting the next output.</p>
+<p>Karpathy&rsquo;s introduction to the <a href="https://karpathy.github.io/2015/05/21/rnn-effectiveness/">The Unreasonable Effectiveness of Recurrent Neural Networks</a> along with the attached <a href="https://gist.github.com/karpathy/d4dee566867f8291f086">Character Level RNN</a> are among the best resources to get started with RNN. However, as I progressed my way through the implementation of min-char-rnn, I realized that while the blogpost suffices for an intuitive understanding of RNN, and the code works through the implementation from scratch, a lot of heavy-lifting in terms of manual backpropagation implementation, and flow of gradient during training to update the weights and parameters of the models are left for the readers to understand on their own.</p>
+<p>We&rsquo;ll be going through the steps one-by-one, mainly focusing on backpropagation calculation in detail to understand the behind-the-hood working of RNN.</p>
+<h2 id="overview-of-rnn"><strong>Overview of RNN</strong><a hidden class="anchor" aria-hidden="true" href="#overview-of-rnn">#</a></h2>
+<p>Recurrent Neural Networks are at the core an attempt to develop an internal structure that is appropriate for a particular task domain using internal &lsquo;hidden&rsquo; units which are not part of the input or output vectors.</p>
+<p>Learning becomes more interesting but more difficult when we introduce hidden units whose actual desired states are not specified by the task. The simplest for of the learning procedure is for layered networks which have a layer of inputs at the bottom; any number of intermediate layers; and a layer of output units at the top.</p>
+<p>An input vector is presented to the network by setting the states of the input units.</p>
+<img loading="lazy" src="rnn-unrolled.png" alt="RNN Unrolled"  title="RNN Unrolled"  />
+<p>Then the stats of the units in each layer are determined by applying steps as followed for input vector $ x_t $ :</p>
+<ul>
+<li>
+<p><strong>Hidden State Calculation:</strong>
+</br> $ h_t = \tanh(W_{xh} \cdot x_t + W_{hh} \cdot h_{t-1} + b_h) $</p>
+</li>
+<li>
+<p><strong>Output and Softmax:</strong>
+<br> $ y_t = W_{hy} \cdot h_t + b_y $
+<br> $ p_t = \frac{ \exp(y_t) }{ \sum exp(y_t) } $ </br></p>
+</li>
+</ul>
+<p>where, $ h_{t-1} $ represents the hidden state input from previous states, $ b_h $ represents the biased term in hidden state calculation, and $ p_t $ represents the softmax output from the output vector $ y_t $.</p>
+<p><img loading="lazy" src="rnn_illustration.jpeg" alt="RNN Illustration"  title="RNN Illustration"  />
+
+<em>An illustration of character level RNN from Andrej Karpathy&rsquo;s blogpost</em></p>
+<p>RNNs are particularly effective in tasks like language modeling, machine translation, etc. where the context of previous characters are crucial for predicting the next one.</p>
+<p>Now, let&rsquo;s work through min-char-rnn code one-step at a time:</p>
+<h3 id="lossfun-function"><code>lossFun</code> Function:<a hidden class="anchor" aria-hidden="true" href="#lossfun-function">#</a></h3>
+<p>This function runs both forward and backward passes through the RNN and computes the loss and gradients.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">lossFun</span>(inputs, targets, hprev):
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  Runs forward and backward passes through the RNN.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  inputs, targets: Lists of integers. For some i, inputs[i] is the input
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                   character (encoded as an index to the ix_to_char map) and
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                   targets[i] is the corresponding next character in the
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                   training data (similarly encoded).
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  hprev: Hx1 array of initial hidden state.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  returns: loss, gradients on model parameters, and last hidden state.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &#34;&#34;&#34;</span>
+</span></span></code></pre></div><p><strong>Inputs</strong>:</p>
+<ul>
+<li><code>inputs</code>: Indices representing the input characters.</li>
+<li><code>targets</code>: Indices representing the next characters in the sequence</li>
+<li><code>hprev</code>: Initial hidden state from the previous sequence</li>
+</ul>
+<p><strong>Outputs</strong>:</p>
+<ul>
+<li><code>loss</code>: Cross-entropy loss</li>
+<li>Gradients for the weights and biases (<code>dWxh, dWhh, dWhy, dbh, dby</code>)</li>
+<li>The last hidden state (<code>hs[len(inputs)-1]</code>)</li>
+</ul>
+<h3 id="forward-pass">Forward Pass<a hidden class="anchor" aria-hidden="true" href="#forward-pass">#</a></h3>
+<p>The forward pass computes the hidden states and the outputs at each time step.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Initialize storage for variables needed for forward and backward passes</span>
+</span></span><span style="display:flex;"><span>xs, hs, ys, ps <span style="color:#f92672">=</span> {}, {}, {}, {}
+</span></span><span style="display:flex;"><span>hs[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>copy(hprev) <span style="color:#75715e"># Initialize with the given hidden state</span>
+</span></span><span style="display:flex;"><span>loss <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span></code></pre></div><p>For each time step $ t $:</p>
+<ol>
+<li><strong>Input Encoding</strong>: The input characters are converted into one-hot encoding vectors for input into the model.</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>xs[t] <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>zeros((vocab_size, <span style="color:#ae81ff">1</span>)) <span style="color:#75715e"># one-hot encoding</span>
+</span></span><span style="display:flex;"><span>xs[t][inputs[t]] <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><ol start="2">
+<li><strong>Hidden State Calculation</strong>: The hidden states to capture the task information and develop/emulate an internal structure is computed using:
+$$ h_t = \tanh(W_{xh}\cdot x_t + W_{hh} \cdot h_{t-1} + b_h) $$</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>hs[t] <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>tanh(np<span style="color:#f92672">.</span>dot(Wxh, xs[t]) <span style="color:#f92672">+</span> np<span style="color:#f92672">.</span>dot(Whh, hs[t<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]) <span style="color:#f92672">+</span> bh)
+</span></span></code></pre></div><ol start="3">
+<li><strong>Output and Softmax</strong>: We first calculate the unnormalized scores (<code>ys[t]</code>) and then converet those into softmax probabilities (<code>ps[t]</code>) for output:
+$$ y_t = W_{hy} \cdot h_t + b_y $$
+$$ p_t = \frac{\exp(y_t)}{\sum \exp(y_t)} $$</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>ys[t] <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>dot(Why, hs[t]) <span style="color:#f92672">+</span> by
+</span></span><span style="display:flex;"><span>ps[t] <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>exp(ys[t]) <span style="color:#f92672">/</span> np<span style="color:#f92672">.</span>sum(np<span style="color:#f92672">.</span>exp(ys[t]))
+</span></span></code></pre></div><ol start="4">
+<li><strong>Loss Calculation</strong>: The cross-entropy loss at each time step is then added up using:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>loss <span style="color:#f92672">+=</span> <span style="color:#f92672">-</span>np<span style="color:#f92672">.</span>log(ps[t][targets[t],<span style="color:#ae81ff">0</span>])
+</span></span></code></pre></div><h3 id="backpropagation-through-time-bptt">Backpropagation through time (BPTT)<a hidden class="anchor" aria-hidden="true" href="#backpropagation-through-time-bptt">#</a></h3>
+<ol>
+<li><strong>Gradient of Loss w.r.t Softmax Output (<code>ps[t]</code>):</strong>
+For each time step t:
+The loss at time step $ t $ is given by:
+$$ Loss_t = - \log(p_{t,target}) $$
+The derivative of the loss w.r.t softmax probabilities $p_t$ is:
+$$ \frac{\partial Loss_t}{\partial p_t} = p_t - 1_{target} $$
+Where:</li>
+</ol>
+<ul>
+<li>$ p_t $ is the softmax probability vector at time step t.</li>
+<li>$ 1_{target} $ is a one-hot vector with a 1 at the index of the target character.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dy <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>copy(ps[t])
+</span></span><span style="display:flex;"><span>dy[targets[t]] <span style="color:#f92672">-=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><ol start="2">
+<li><strong>Gradient w.r.t Output Weights (<code>Why</code>) and Bias (<code>by</code>):</strong>
+The output $ y_t $ at each time step is computed as:
+$$ y_t = W_{hy} \cdot h_t + b_y $$
+The gradients of the loss w.r.t the weights and biases are given by:
+$$ \frac{ \partial Loss_t }{\partial W_{hy}} =
+\sum_t \left(\frac{ \partial Loss_t }{ \partial y_t } \cdot \frac{ \partial y_t }{ \partial W_{hy}} \right)= \sum_t( p_t - 1_{target}).h_t^T $$
+$$ \frac {\partial Loss_t }{\partial b_y} = \sum_t(p_t - 1_{target}) $$</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dWhy <span style="color:#f92672">+=</span> np<span style="color:#f92672">.</span>dot(dy, hs[t]<span style="color:#f92672">.</span>T)
+</span></span><span style="display:flex;"><span>dby <span style="color:#f92672">+=</span> dy
+</span></span></code></pre></div><ol start="3">
+<li><strong>Gradient w.r.t Hidden State (<code>h_t</code>):</strong>
+To backpropagate into the hidden state, we need to account for both the current time step&rsquo;s gradient and the incoming gradient from the next time step:
+$$ \frac{ \partial Loss_t }{\partial h_t} = W_{hy}^T \cdot \frac{\partial Loss_t}{ \partial y_t} + \frac{\partial Loss_{t+1}}{\partial h_t} $$
+Where:</li>
+</ol>
+<ul>
+<li>$ \frac{\partial Loss_{t+1}}{\partial h_t} $ is the gradient passed back from the next time step.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dh <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>dot(Why<span style="color:#f92672">.</span>T, dy) <span style="color:#f92672">+</span> dhnext
+</span></span></code></pre></div><ol start="4">
+<li><strong>Gradient w.r.t Activation Function (<code>tanh</code>):</strong>
+The hidden state is computed using the $ tanh $ activation function:
+$$ h_t = \tanh(W_{xh} \cdot x_t + W_{hh} \cdot h_{t-1} + b_h) $$
+The input to the <code>tanh</code> activation function is:
+$$ a_t = W_{xh} \cdot x_t + W_{hh} \cdot h_{t-1} + b_h $$
+The gradient through the $ tanh $ function is:
+$$ dhraw = \frac{\partial Loss_t}{\partial a_t} = \frac{ \partial Loss_t }{\partial ({W_{xh} \cdot x_t + W_{hh} \cdot h_{t-1} + b_h })} = (1 - h_{t}^2) \odot \frac{ \partial Loss_t }{\partial h_t} $$
+Here, $ (1-h_t^2) $ is the derivative of $ tanh(h_t) $.</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dhraw <span style="color:#f92672">=</span> (<span style="color:#ae81ff">1</span><span style="color:#f92672">-</span> hs[t]<span style="color:#f92672">*</span>hs[t]) <span style="color:#f92672">*</span> dh
+</span></span></code></pre></div><ol start="5">
+<li><strong>Gradient w.r.t Input Weights (<code>Wxh</code>), Hidden Weights (<code>Whh</code>), and Hidden Bias (<code>bh</code>):</strong>
+Now, compute the gradients w.r.t weights and biases connecting the inputs and hidden states:
+The input to the <code>tanh</code> activation function is:
+$$ a_t = W_{xh} \cdot x_t + W_{hh} \cdot h_{t-1} + b_h $$</li>
+</ol>
+<ul>
+<li>For input-to-hidden weights $ W_{xh} $:
+$$ \frac{\partial Loss_t}{\partial W_{xh}} = \sum_t \left(\frac{\partial Loss_t}{\partial a_t} \cdot \frac{\partial a_t}{\partial W_{xh}} \right)= \sum_t \left(\text{dhraw} \cdot x_t^T \right) $$</li>
+<li>For hidden-to-hidden weights $ W_{hh} $:
+$$ \frac{\partial Loss_t}{\partial W_{hh}} = \sum_t \left(\frac{ \partial Loss_t}{\partial a_t} \cdot \frac{ \partial a_t }{\partial W_{hh}} \right) = \sum_t (\text{dhraw} \cdot h_{t-1}^T) $$</li>
+<li>For hidden bias $ b_h $:
+$$
+\frac{\partial Loss_t}{\partial b_h} = \sum_t \frac{\partial Loss}{\partial a_t} = \sum_tdhraw
+$$</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dbh <span style="color:#f92672">+=</span> dhraw
+</span></span><span style="display:flex;"><span>dWxh <span style="color:#f92672">+=</span> np<span style="color:#f92672">.</span>dot(dhraw, xs[t]<span style="color:#f92672">.</span>T)
+</span></span><span style="display:flex;"><span>dWhh <span style="color:#f92672">+=</span> np<span style="color:#f92672">.</span>dot(dhraw, hs[t<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]<span style="color:#f92672">.</span>T)
+</span></span></code></pre></div><ol start="6">
+<li><strong>Gradient Propagation to Previous Time Step (<code>dhnext</code>):</strong>
+Propogate the gradient back to the previous time step:
+$$
+\frac{ \partial Loss_t}{\partial h_{t-1}} = W_{hh}^T \cdot \frac{\partial Loss_t}{\partial a_t} = W_{hh}^T \cdot dhraw
+$$</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dhnext <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>dot(Whh<span style="color:#f92672">.</span>T, dhraw)
+</span></span></code></pre></div><h4 id="summary">Summary:<a hidden class="anchor" aria-hidden="true" href="#summary">#</a></h4>
+<ul>
+<li><strong>Step 1:</strong> Compute gradient of the loss w.r.t the output probabilities.</li>
+<li><strong>Step 2:</strong> Calculate the gradients for the weights and biases connecting hidden states to outputs.</li>
+<li><strong>Step 3:</strong> Propagate the gradient through the hidden state, taking into account the contribution from the next time step.</li>
+<li><strong>Step 4:</strong> Backpropagate through the $ tanh $ activation function.</li>
+<li><strong>Step 5:</strong> Compute the gradients w.r.t the weights and biases connecting the inputs and hidden states, as well as the hidden-to-hidden weights.</li>
+<li><strong>Step 6:</strong> Propagate the gradient back to the previous time step&rsquo;s hidden state.</li>
+</ul>
+<p>These steps iteratively update the gradient accumulations by iterating backward through the time steps of the sequence.</p>
+<p>Now, with all the heavy-lifting stuffs taken care of, I think understanding RNNs in-depth would be a lot easier than before. Here&rsquo;s the <a href="https://github.com/shreyashkar-ml/Pytorch-learning/blob/main/min_char_rnn_explained.ipynb">min-char-rnn code</a> commented and explained a bit more in details to work through the code without losing the touch with explanation.</p>
+<h2 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h2>
+<ol>
+<li><a href="https://gwern.net/doc/ai/nn/1986-rumelhart-2.pdf">Learning representations by backpropagating errors</a></li>
+<li><a href="https://karpathy.github.io/2015/05/21/rnn-effectiveness/">The Unreasonable Effectiveness of Recurrent Neural Networks</a></li>
+<li><a href="https://gist.github.com/karpathy/d4dee566867f8291f086">Character Level RNN</a></li>
+<li><a href="https://dennybritz.com/posts/wildml/recurrent-neural-networks-tutorial-part-1/">Tutorial on Recurrent Neural Networks</a></li>
+<li><a href="https://eli.thegreenplace.net/2018/understanding-how-to-implement-a-character-based-rnn-language-model/">A Nice in-depth walkthrough of Character RNN</a></li>
+<li><a href="https://kvitajakub.github.io/2016/04/14/rnn-diagrams/">RNN Illustrations</a></li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2024 <a href="https://shreyashkar-ml.github.io/">Shreyashkar Lal Sahu</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

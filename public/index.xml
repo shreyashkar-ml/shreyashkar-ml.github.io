@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Shreyashkar Lal Sahu</title>
+    <link>https://shreyashkar-ml.github.io/</link>
+    <description>Recent content on Shreyashkar Lal Sahu</description>
+    <generator>Hugo -- 0.135.0</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 22 Sep 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://shreyashkar-ml.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Decoding Karpathy&#39;s min-char-rnn (character level Recurrent Neural Network)</title>
+      <link>https://shreyashkar-ml.github.io/posts/min-char-rnn/</link>
+      <pubDate>Sun, 22 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://shreyashkar-ml.github.io/posts/min-char-rnn/</guid>
+      <description>&lt;p&gt;Recurrent Neural Networks (RNN) have existed for long at this point, and RNNs without attention mechanism (plain-simple RNN architecture) are no longer the hottest thing either.&lt;/p&gt;
+&lt;p&gt;Still, RNN represents one of the first step towards understanding training for sequential data input, where the context of previous inputs are crucial for predicting the next output.&lt;/p&gt;
+&lt;p&gt;Karpathy&amp;rsquo;s introduction to the &lt;a href=&#34;https://karpathy.github.io/2015/05/21/rnn-effectiveness/&#34;&gt;The Unreasonable Effectiveness of Recurrent Neural Networks&lt;/a&gt; along with the attached &lt;a href=&#34;https://gist.github.com/karpathy/d4dee566867f8291f086&#34;&gt;Character Level RNN&lt;/a&gt; are among the best resources to get started with RNN. However, as I progressed my way through the implementation of min-char-rnn, I realized that while the blogpost suffices for an intuitive understanding of RNN, and the code works through the implementation from scratch, a lot of heavy-lifting in terms of manual backpropagation implementation, and flow of gradient during training to update the weights and parameters of the models are left for the readers to understand on their own.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>About Me</title>
+      <link>https://shreyashkar-ml.github.io/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://shreyashkar-ml.github.io/about/</guid>
+      <description>about</description>
+    </item>
+    <item>
+      <title>Code</title>
+      <link>https://shreyashkar-ml.github.io/code/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://shreyashkar-ml.github.io/code/</guid>
+      <description>code</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,38 @@
+.post-entry {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--gap);
+    margin-bottom: var(--gap);
+    background: var(--entry);
+  }
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.home-container h1 {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+}
+
+.home-container nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.home-container nav a {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--primary);
+}
+
+.home-container nav a:hover {
+  background-color: var(--primary);
+  color: var(--theme);
+}
