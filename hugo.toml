@@ -5,6 +5,11 @@ subtitle = "Data Scientist and ML Enthusiast"
 theme = "PaperMod"
 
 [params]
+
+  # Add your title and subtitle
+  title = "Shreyashkar Lal Sahu"
+  subtitle = "Data Scientist and ML Enthusiast"
+
   # PaperMod specific parameters
   defaultTheme = "auto"
   ShowReadingTime = true
@@ -17,37 +22,6 @@ theme = "PaperMod"
 
   # LaTeX support
   math = true
-
-[markup]
-  [markup.goldmark]
-    [markup.goldmark.renderer]
-      unsafe = true
-    [markup.goldmark.parser]
-      wrapStandAloneImageWithinParagraph = false
-      [markup.goldmark.parser.attribute]
-        block = true
-
-[menu]
-  [[menu.main]]
-    identifier = "about"
-    name = "About"
-    url = "/about/"
-    weight = 20
-  [[menu.main]]
-    identifier = "blogs"
-    name = "Blogs"
-    url = "/posts/"
-    weight = 10
-  [[menu.main]]
-    identifier = "code"
-    name = "Code"
-    url = "/code/"
-    weight = 30
-
-[params]
-  # Add your title and subtitle
-  title = "Shreyashkar Lal Sahu"
-  subtitle = "Data Scientist and ML Enthusiast"
 
   # Enable profile mode to show social icons
   [params.profileMode]
@@ -77,4 +51,30 @@ theme = "PaperMod"
   [[params.profileMode.buttons]]
     name = "Code"
     url = "/code/"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+    [markup.goldmark.parser]
+      wrapStandAloneImageWithinParagraph = false
+      [markup.goldmark.parser.attribute]
+        block = true
+
+[menu]
+  [[menu.main]]
+    identifier = "about"
+    name = "About"
+    url = "/about/"
+    weight = 20
+  [[menu.main]]
+    identifier = "blogs"
+    name = "Blogs"
+    url = "/posts/"
+    weight = 10
+  [[menu.main]]
+    identifier = "code"
+    name = "Code"
+    url = "/code/"
+    weight = 30
 
