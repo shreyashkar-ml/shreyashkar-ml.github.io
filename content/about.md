@@ -5,6 +5,6 @@ url: "/about/"
 summary: "about"
 ---
 
-Hi, I am Shreyashkar.
-- I am interested in building products in the area of Data Science, Machine Learning, and Large Language Models.
-- I currently work as a Data Scientist at [Cyborgintell](https://www.cyborgintell.com)
+Hi, I am Shreyashkar
+- I currently work as AI Engineer at [iTuring](https://www.ituring.ai).
+- I work across the intersection of Deep Learning, High Performance Data Engineering, and LLM research and engineering.
