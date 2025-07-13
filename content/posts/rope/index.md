@@ -105,7 +105,7 @@ $$
 the attention mechanism computes,
 
 $$
-attn_{m,n} = q_m^T k_n = \left\{R(m) W_q x_m \right\}^T \left\{ R(n) W_k x_n \right\}
+attn_{m,n} = q_m^T k_n = \left\\{R(m) W_q x_m \right\\}^T \left\\{ R(n) W_k x_n \right\\}
 $$
 
 where, **RoPE** ensures that $R(m)^T R(n) = R(n - m)$, i.e., the inner product depends only on $\Delta = (n - m)$ due to the properties of rotation matrices.
