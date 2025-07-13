@@ -56,6 +56,21 @@
 
     </style>
 </noscript>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ]
+        });
+    });
+</script>
+
 
 
 
@@ -65,7 +80,6 @@
 <meta property="og:url" content="https://shreyashkar-ml.github.io/code/" /><meta property="article:section" content="" />
 
 <meta property="og:site_name" content="Shreyashkar Lal Sahu" />
-
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Code"/>
 <meta name="twitter:description" content="code"/>
@@ -95,8 +109,8 @@
   "keywords": [
     
   ],
-  "articleBody": "Here you can list your coding projects or link to your GitHub profile.\n",
-  "wordCount" : "13",
+  "articleBody": " TinyFT: Lightweight Fine-Tuning Library TinyFT is a lightweight, modular toy-scale library designed from scratch for fine-tuning LLMs.\nDP-ZeRO Trainer Differential Privacy experimentations, and implementation of Differential Privacy training with Zero Redundancy Optimizer support.\nDaily Quantitative Trading backtesting. A toy-scale CLI-based backtesting Quantitative Daily Trading system with support for various common trading strategies.\n",
+  "wordCount" : "52",
   "inLanguage": "en",
   "datePublished": "0001-01-01T00:00:00Z",
   "dateModified": "0001-01-01T00:00:00Z",
@@ -179,13 +193,37 @@
   <header class="post-header">
     <h1 class="post-title">Code</h1>
   </header>
-  <p>Here you can list your coding projects or link to your GitHub profile.</p>
-
+  <div class="posts-list">
+    <a href="https://github.com/shreyashkar-ml/TinyFT" target="_blank" rel="noopener" class="post-entry">
+        <header class="entry-header">
+            <h2>TinyFT: Lightweight Fine-Tuning Library</h2>
+        </header>
+        <div class="entry-content">
+            <p>TinyFT is a lightweight, modular toy-scale library designed from scratch for fine-tuning LLMs.</p>
+        </div>
+    </a>
+    <a href="https://github.com/shreyashkar-ml/differential_privacy" target="_blank" rel="noopener" class="post-entry">
+        <header class="entry-header">
+            <h2>DP-ZeRO Trainer</h2>
+        </header>
+        <div class="entry-content">
+            <p>Differential Privacy experimentations, and implementation of Differential Privacy training with Zero Redundancy Optimizer support.</p>
+        </div>
+    </a>
+    <a href="https://github.com/shreyashkar-ml/QuantitativeTrading" target="_blank" rel="noopener" class="post-entry">
+        <header class="entry-header">
+            <h2>Daily Quantitative Trading backtesting.</h2>
+        </header>
+        <div class="entry-content">
+            <p>A toy-scale CLI-based backtesting Quantitative Daily Trading system with support for various common trading strategies.</p>
+        </div>
+    </a>
+</div>
 </article>
     </main>
     
 <footer class="footer">
-        <span>&copy; 2024 <a href="https://shreyashkar-ml.github.io/">Shreyashkar Lal Sahu</a></span> · 
+        <span>&copy; 2025 <a href="https://shreyashkar-ml.github.io/">Shreyashkar Lal Sahu</a></span> · 
 
     <span>
         Powered by
@@ -252,6 +290,53 @@
         }
     })
 
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
 </script>
 </body>
 

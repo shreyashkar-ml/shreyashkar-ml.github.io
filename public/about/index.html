@@ -56,6 +56,21 @@
 
     </style>
 </noscript>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ]
+        });
+    });
+</script>
+
 
 
 
@@ -65,7 +80,6 @@
 <meta property="og:url" content="https://shreyashkar-ml.github.io/about/" /><meta property="article:section" content="" />
 
 <meta property="og:site_name" content="Shreyashkar Lal Sahu" />
-
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="About Me"/>
 <meta name="twitter:description" content="about"/>
@@ -95,8 +109,8 @@
   "keywords": [
     
   ],
-  "articleBody": "Hiiiiiiii\n",
-  "wordCount" : "1",
+  "articleBody": "Hi, I am Shreyashkar\nI currently work as AI Engineer at iTuring. I work across the intersection of Deep Learning, High Performance Data Engineering, and LLM research and engineering. ",
+  "wordCount" : "29",
   "inLanguage": "en",
   "datePublished": "0001-01-01T00:00:00Z",
   "dateModified": "0001-01-01T00:00:00Z",
@@ -179,13 +193,17 @@
     <header class = "post-header">
         <h1 class = "post-title">About Me</h1>
     </header>
-    <p>Hiiiiiiii</p>
+    <p>Hi, I am Shreyashkar</p>
+<ul>
+<li>I currently work as AI Engineer at <a href="https://www.ituring.ai">iTuring</a>.</li>
+<li>I work across the intersection of Deep Learning, High Performance Data Engineering, and LLM research and engineering.</li>
+</ul>
 
 </article>
     </main>
     
 <footer class="footer">
-        <span>&copy; 2024 <a href="https://shreyashkar-ml.github.io/">Shreyashkar Lal Sahu</a></span> · 
+        <span>&copy; 2025 <a href="https://shreyashkar-ml.github.io/">Shreyashkar Lal Sahu</a></span> · 
 
     <span>
         Powered by
@@ -252,6 +270,53 @@
         }
     })
 
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
 </script>
 </body>
 

@@ -6,12 +6,21 @@
     <description>Recent content in Blogs on Shreyashkar Lal Sahu</description>
     <generator>Hugo -- 0.135.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 22 Sep 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 13 Jul 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://shreyashkar-ml.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A deep-dive into RoPE, and why it matters?</title>
+      <link>https://shreyashkar-ml.github.io/posts/rope/</link>
+      <pubDate>Sun, 13 Jul 2025 00:00:00 +0000</pubDate>
+      <guid>https://shreyashkar-ml.github.io/posts/rope/</guid>
+      <description>&lt;h2 id=&#34;what-is-positional-encoding-and-why-it-matters&#34;&gt;What is Positional Encoding and why it matters?&lt;/h2&gt;
+&lt;p&gt;When training any large language model based on &lt;strong&gt;Transformers&lt;/strong&gt; architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension &lt;strong&gt;Attention&lt;/strong&gt; network where, the positional information between tokens aren&amp;rsquo;t preserved natively, it&amp;rsquo;s simply the representation of &lt;strong&gt;attention&lt;/strong&gt; scores between each token (normalized by the $ \sqrt{\text{dim_len}} $ ).&lt;/p&gt;
+&lt;p&gt;In order to preserve positional information such that the network learns differently about &lt;em&gt;&amp;ldquo;Dog attacks the Cat&amp;rdquo;&lt;/em&gt; and &lt;em&gt;&amp;ldquo;Cat attacks the Dog&amp;rdquo;&lt;/em&gt;, we add a &lt;strong&gt;deterministic&lt;/strong&gt; (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Decoding Karpathy&#39;s min-char-rnn (character level Recurrent Neural Network)</title>
       <link>https://shreyashkar-ml.github.io/posts/min-char-rnn/</link>
-      <pubDate>Sun, 22 Sep 2024 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 05 Oct 2024 00:00:00 +0000</pubDate>
       <guid>https://shreyashkar-ml.github.io/posts/min-char-rnn/</guid>
       <description>&lt;p&gt;Recurrent Neural Networks (RNN) have existed for long at this point, and RNNs without attention mechanism (plain-simple RNN architecture) are no longer the hottest thing either.&lt;/p&gt;
 &lt;p&gt;Still, RNN represents one of the first step towards understanding training for sequential data input, where the context of previous inputs are crucial for predicting the next output.&lt;/p&gt;

@@ -57,6 +57,21 @@
 
     </style>
 </noscript>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ]
+        });
+    });
+</script>
+
 
 
 
@@ -64,7 +79,6 @@
 <meta property="og:description" content="" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://shreyashkar-ml.github.io/posts/" /><meta property="og:site_name" content="Shreyashkar Lal Sahu" />
-
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Blogs"/>
 <meta name="twitter:description" content=""/>
@@ -148,11 +162,25 @@
         <div class="breadcrumb">
             <a href="https://shreyashkar-ml.github.io/">Home</a>
         </div> 
-<header class="page-header">
+<header class="page-header"><div class="breadcrumbs"><a href="https://shreyashkar-ml.github.io/">Home</a></div>
   <h1>
     Blogs
   </h1>
 </header>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">A deep-dive into RoPE, and why it matters?
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>What is Positional Encoding and why it matters? When training any large language model based on Transformers architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension Attention network where, the positional information between tokens aren’t preserved natively, it’s simply the representation of attention scores between each token (normalized by the $ \sqrt{\text{dim_len}} $ ).
+In order to preserve positional information such that the network learns differently about “Dog attacks the Cat” and “Cat attacks the Dog”, we add a deterministic (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-07-13 00:00:00 +0000 UTC'>July 13, 2025</span>&nbsp;·&nbsp;7 min</footer>
+  <a class="entry-link" aria-label="post link to A deep-dive into RoPE, and why it matters?" href="https://shreyashkar-ml.github.io/posts/rope/"></a>
+</article>
 
 <article class="post-entry"> 
   <header class="entry-header">
@@ -165,13 +193,13 @@ Still, RNN represents one of the first step towards understanding training for s
 Karpathy’s introduction to the The Unreasonable Effectiveness of Recurrent Neural Networks along with the attached Character Level RNN are among the best resources to get started with RNN. However, as I progressed my way through the implementation of min-char-rnn, I realized that while the blogpost suffices for an intuitive understanding of RNN, and the code works through the implementation from scratch, a lot of heavy-lifting in terms of manual backpropagation implementation, and flow of gradient during training to update the weights and parameters of the models are left for the readers to understand on their own.
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2024-09-22 00:00:00 +0000 UTC'>September 22, 2024</span></footer>
+  <footer class="entry-footer"><span title='2024-10-05 00:00:00 +0000 UTC'>October 5, 2024</span>&nbsp;·&nbsp;7 min</footer>
   <a class="entry-link" aria-label="post link to Decoding Karpathy&#39;s min-char-rnn (character level Recurrent Neural Network)" href="https://shreyashkar-ml.github.io/posts/min-char-rnn/"></a>
 </article>
     </main>
     
 <footer class="footer">
-        <span>&copy; 2024 <a href="https://shreyashkar-ml.github.io/">Shreyashkar Lal Sahu</a></span> · 
+        <span>&copy; 2025 <a href="https://shreyashkar-ml.github.io/">Shreyashkar Lal Sahu</a></span> · 
 
     <span>
         Powered by
