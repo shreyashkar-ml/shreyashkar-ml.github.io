@@ -7,7 +7,7 @@ toc: true
 ---
 ## What is Positional Encoding and why it matters?
 
-When training any large language model based on **Transformers** architecture, our input token sequences tend to form a $(\text{seq\_len} \times \text{seq\_len})$ dimension **Attention** network where, the positional information between tokens aren't preserved natively, it's simply the representation of **attention** scores between each token (normalized by the $\sqrt{\text{dim\_len}}$).
+When training any large language model based on **Transformers** architecture, our input token sequences tend to form a $\text{seq\\_len} \times \text{seq\\_len}$ dimension **Attention** network where, the positional information between tokens aren't preserved natively, it's simply the representation of **attention** scores between each token (normalized by the $\sqrt{\text{dim\\_len}}$).
 
 In order to preserve positional information such that the network learns differently about *"Dog attacks the Cat"* and *"Cat attacks the Dog"*, we add a **deterministic** (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.
 
@@ -50,19 +50,21 @@ There are a few limitations even to *Sinusoidal Positional Embedding* that we wi
 
 Consider, the example from above, *"Dog attacks the Cat"*, in order to reliably encode the relative position between tokens, we need a positional embedding method such that the dot product to the applied embeddings for both *"Dog"* and *"Cat"* remains the same in both the examples, *"Dog attacks the Cat"* and *"Once upon a time, a Dog attacks the Cat"*, i.e., the dot product between two embeddings for tokens $x_m$ and $x_n$ depends only on their relative position to each other $\Delta = (m - n)$.
 
+![Relative Delta Representation](delta.png "Relative Delta Representation")
+*Intuitive illustration of relative positional consistency*
+
 RoPE encodes relative positional information in the *attention dot product* between entire query and key vectors, even though the operation is defined per 2D pair of dimensions.
 
-- for a **d-dimensional embedding** (say d = 768)
-**RoPE** partitions the input token vector $\vec{x}$ into $\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair.
+For a **d-dimensional embedding** (say d = 768) **RoPE** partitions the input token vector $\vec{x}$ into $\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair. <br>
 
 $$
 R_{\theta_{m,i}} =
 \left(
 \begin{array}{cccc}
-\mathbf{R}_{\theta_0} & & & \\\\
-& \mathbf{R}_{\theta_1} & & \\\\
+\mathbf{R_{\theta_0}} & & & \\\\
+& \mathbf{R_{\theta_1}} & & \\\\
 & & \ddots & \\\\
-& & & \mathbf{R}_{\theta_{d/2}}
+& & & \mathbf{R_{\theta_{d/2}}}
 \end{array}
 \right)
 \left(
@@ -76,15 +78,20 @@ x_d
 $$
 
 where, each $R_{\theta_i}$ refers to a rotation matrix
+
 $$
 \begin{pmatrix}
 \cos(\theta_i) & -\sin(\theta_i) \\\\
 \sin(\theta_i) &  \cos(\theta_i)
 \end{pmatrix}
 $$
+
 for any given specific token position $m$.
 
 Each 2D operation operates independently, rotating a 2D subvector using a fixed frequency $\theta_i$.
+
+![Dimensional Rotation Representation](rotation_repr.png "Dimensional Rotation Representation")
+*Intuitive illustration of the rotation of a pair-wise 2D sub-vector.*
 
 For any attention network:
 - Query vector: $q = W_q \cdot x$
@@ -102,9 +109,11 @@ R(n)k  = R(m) \cdot (W_k \cdot x_n)
 $$
 
 the attention mechanism computes,
+
 $$
-attn_{m,n} = q_m^T k_n = \left\{R(m) W_q x_m \right\}^T \left\{ R(n) W_k x_n \right\}
+attn_{m,n} = q_m^T k_n = \left\\{R(m) W_q x_m \right\\}^T \left\\{ R(n) W_k x_n \right\\}
 $$
+
 where, **RoPE** ensures that $R(m)^T R(n) = R(n - m)$, i.e., the inner product depends only on $\Delta = (n - m)$ due to the properties of rotation matrices.
 
 Hence, $\langle R(m)q, R(n)k \rangle = \langle R(n-m)q,k \rangle$
