@@ -55,12 +55,13 @@ RoPE encodes relative positional information in the *attention dot product* betw
 For a **d-dimensional embedding** (say d = 768) **RoPE** partitions the input token vector $\vec{x}$ into $\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair. <br>
 
 $$
+R_{\theta_{m,i}} =
 \left(
 \begin{array}{cccc}
-\mathbf{R}_{\theta_0} & & & \\\\
-& \mathbf{R}_{\theta_1} & & \\\\
+\mathbf{R_{\theta_0}} & & & \\\\
+& \mathbf{R_{\theta_1}} & & \\\\
 & & \ddots & \\\\
-& & & \mathbf{R}_{\theta_{d/2}}
+& & & \mathbf{R_{\theta_{d/2}}}
 \end{array}
 \right)
 \left(
