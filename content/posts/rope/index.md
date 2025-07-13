@@ -7,7 +7,7 @@ toc: true
 ---
 ## What is Positional Encoding and why it matters?
 
-When training any large language model based on **Transformers** architecture, our input token sequences tend to form a $\text{seq\_len} \times \text{seq\_len}$ dimension **Attention** network where, the positional information between tokens aren't preserved natively, it's simply the representation of **attention** scores between each token (normalized by the $\sqrt{\text{dim\_len}}$).
+When training any large language model based on **Transformers** architecture, our input token sequences tend to form a $\text{seq\\_len} \times \text{seq\\_len}$ dimension **Attention** network where, the positional information between tokens aren't preserved natively, it's simply the representation of **attention** scores between each token (normalized by the $\sqrt{\text{dim\\_len}}$).
 
 In order to preserve positional information such that the network learns differently about *"Dog attacks the Cat"* and *"Cat attacks the Dog"*, we add a **deterministic** (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.
 
