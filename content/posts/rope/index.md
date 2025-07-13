@@ -7,7 +7,7 @@ toc: true
 ---
 ## What is Positional Encoding and why it matters?
 
-When training any large language model based on **Transformers** architecture, our input token sequences tend to form a $ \text{seq\_len} \times \text{seq\_len} $ dimension **Attention** network where, the positional information between tokens aren't preserved natively, it's simply the representation of **attention** scores between each token (normalized by the $ \sqrt{\text{dim\_len}} $).
+When training any large language model based on **Transformers** architecture, our input token sequences tend to form a $\text{seq\_len} \times \text{seq\_len}$ dimension **Attention** network where, the positional information between tokens aren't preserved natively, it's simply the representation of **attention** scores between each token (normalized by the $\sqrt{\text{dim\_len}}$).
 
 In order to preserve positional information such that the network learns differently about *"Dog attacks the Cat"* and *"Cat attacks the Dog"*, we add a **deterministic** (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.
 
@@ -54,7 +54,6 @@ RoPE encodes relative positional information in the *attention dot product* betw
 
 - for a **d-dimensional embedding** (say d = 768)
 **RoPE** partitions the input token vector $\vec{x}$ into $\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair.
-<br>
 $$
 R_{ \theta_{m,i} } =
 \left(
@@ -74,7 +73,6 @@ x_d
 \end{array}
 \right)
 $$
-</br>
 where, each $R_{\theta_i}$ refers to a rotation matrix
 $$
 \begin{pmatrix}
@@ -102,7 +100,9 @@ R(n)k  = R(m) \cdot (W_k \cdot x_n)
 $$
 
 the attention mechanism computes,
-<br> $ attn_{m,n} = q_m^T k_n = \left\{R(m) W_q x_m \right\}^T \left\{ R(n) W_k x_n \right\} $ </br>
+$$
+attn_{m,n} = q_m^T k_n = \left\{R(m) W_q x_m \right\}^T \left\{ R(n) W_k x_n \right\}
+$$
 where, **RoPE** ensures that $R(m)^T R(n) = R(n - m)$, i.e., the inner product depends only on $\Delta = (n - m)$ due to the properties of rotation matrices.
 
 Hence, $\langle R(m)q, R(n)k \rangle = \langle R(n-m)q,k \rangle$
