@@ -13,19 +13,20 @@
   {{ .Content }}
 </div>
 
-{{ $pages := where site.RegularPages "Type" "in" "projects" }}
-{{ range $pages }}
-<article class="post-entry">
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">
-      {{- .Title }}
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>{{ .Summary | plainify | htmlUnescape }}{{ if .Truncated }}...{{ end }}</p>
-  </div>
-  <a class="entry-link" aria-label="post link to {{ .Title | plainify }}" href="{{ .Permalink }}"></a>
-</article>
+{{ if site.Data.projects }}
+  {{ range site.Data.projects.projects }}
+    <article class="post-entry">
+      <header class="entry-header">
+        <h2 class="entry-hint-parent">
+          {{- .title }}
+        </h2>
+      </header>
+      <div class="entry-content">
+        <p>{{ .description }}</p>
+      </div>
+      <a class="entry-link" aria-label="post link to {{ .title | plainify }}" href="{{ .url }}" target="_blank" rel="noopener noreferrer"></a>
+    </article>
+  {{ end }}
 {{ end }}
 
 {{- end }}

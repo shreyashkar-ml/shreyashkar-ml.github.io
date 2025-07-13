@@ -1,0 +1,14 @@
+[[projects]]
+title = "TinyFT: Lightweight Fine-Tuning Library"
+description = "TinyFT is a lightweight, modular toy-scale library designed from scratch for fine-tuning LLMs."
+url = "https://github.com/shreyashkar-ml/TinyFT"
+
+[[projects]]
+title = "DP-ZeRO Trainer"
+description = "Differential Privacy experimentations, and implementation of Differential Privacy training with Zero Redundancy Optimizer support."
+url = "https://github.com/shreyashkar-ml/differential_privacy"
+
+[[projects]]
+title = "Daily Quantitative Trading backtesting."
+description = "A toy-scale CLI-based backtesting Quantitative Daily Trading system with support for various common trading strategies."
+url = "https://github.com/shreyashkar-ml/QuantitativeTrading"
