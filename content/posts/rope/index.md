@@ -52,10 +52,9 @@ Consider, the example from above, *"Dog attacks the Cat"*, in order to reliably 
 
 RoPE encodes relative positional information in the *attention dot product* between entire query and key vectors, even though the operation is defined per 2D pair of dimensions.
 
-For a **d-dimensional embedding** (say d = 768) **RoPE** partitions the input token vector $\vec{x}$ into $\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair.
+For a **d-dimensional embedding** (say d = 768) **RoPE** partitions the input token vector $\vec{x}$ into $\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair. <br>
 
 $$
-R_{\theta_{m,i}} =
 \left(
 \begin{array}{cccc}
 \mathbf{R}_{\theta_0} & & & \\\\
