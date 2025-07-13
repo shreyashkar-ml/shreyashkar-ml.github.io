@@ -52,8 +52,8 @@ Consider, the example from above, *"Dog attacks the Cat"*, in order to reliably 
 
 RoPE encodes relative positional information in the *attention dot product* between entire query and key vectors, even though the operation is defined per 2D pair of dimensions.
 
-- for a **d-dimensional embedding** (say d = 768)
-**RoPE** partitions the input token vector $\vec{x}$ into $\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair.
+- for a **d-dimensional embedding** (say d = 768) **RoPE** partitions the input token vector $\vec{x}$ into $\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair.
+
 $$
 R_{\theta_{m,i}} =
 \left(
@@ -73,13 +73,16 @@ x_d
 \end{array}
 \right)
 $$
+
 where, each $R_{\theta_i}$ refers to a rotation matrix
+
 $$
 \begin{pmatrix}
 \cos(\theta_i) & -\sin(\theta_i) \\\\
 \sin(\theta_i) &  \cos(\theta_i)
 \end{pmatrix}
 $$
+
 for any given specific token position $m$.
 
 Each 2D operation operates independently, rotating a 2D subvector using a fixed frequency $\theta_i$.
@@ -99,7 +102,12 @@ $$
 R(n)k  = R(m) \cdot (W_k \cdot x_n)
 $$
 
-the attention mechanism computes, $$attn_{m,n} = q_m^T k_n = \left\{ R(m) W_q x_m \right\}^T \left\{ R(n) W_k x_n \right\}$$
+the attention mechanism computes,
+
+$$
+attn_{m,n} = q_m^T k_n = \left\{R(m) W_q x_m \right\}^T \left\{ R(n) W_k x_n \right\}
+$$
+
 where, **RoPE** ensures that $R(m)^T R(n) = R(n - m)$, i.e., the inner product depends only on $\Delta = (n - m)$ due to the properties of rotation matrices.
 
 Hence, $\langle R(m)q, R(n)k \rangle = \langle R(n-m)q,k \rangle$
