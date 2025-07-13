@@ -8,7 +8,7 @@
 <title>A deep-dive into RoPE, and why it matters? | Shreyashkar Lal Sahu</title>
 <meta name="keywords" content="">
 <meta name="description" content="What is Positional Encoding and why it matters?
-When training any large language model based on Transformers architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension Attention network where, the positional information between tokens aren&rsquo;t preserved natively, it&rsquo;s simply the representation of attention scores between each token (normalized by the $ \sqrt{\text{dim_len}} $ ).
+When training any large language model based on Transformers architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension Attention network where, the positional information between tokens aren&rsquo;t preserved natively, it&rsquo;s simply the representation of attention scores between each token (normalized by the $\sqrt{\text{dim_len}}$).
 In order to preserve positional information such that the network learns differently about &ldquo;Dog attacks the Cat&rdquo; and &ldquo;Cat attacks the Dog&rdquo;, we add a deterministic (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.">
 <meta name="author" content="">
 <link rel="canonical" href="https://shreyashkar-ml.github.io/posts/rope/">
@@ -78,7 +78,7 @@ In order to preserve positional information such that the network learns differe
 
 <link rel="stylesheet" href="/css/extended/custom.min.css"><meta property="og:title" content="A deep-dive into RoPE, and why it matters?" />
 <meta property="og:description" content="What is Positional Encoding and why it matters?
-When training any large language model based on Transformers architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension Attention network where, the positional information between tokens aren&rsquo;t preserved natively, it&rsquo;s simply the representation of attention scores between each token (normalized by the $ \sqrt{\text{dim_len}} $ ).
+When training any large language model based on Transformers architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension Attention network where, the positional information between tokens aren&rsquo;t preserved natively, it&rsquo;s simply the representation of attention scores between each token (normalized by the $\sqrt{\text{dim_len}}$).
 In order to preserve positional information such that the network learns differently about &ldquo;Dog attacks the Cat&rdquo; and &ldquo;Cat attacks the Dog&rdquo;, we add a deterministic (remains the same throughout the network) encoding for each position across the dimensional embedding at each position." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://shreyashkar-ml.github.io/posts/rope/" /><meta property="article:section" content="posts" />
@@ -87,7 +87,7 @@ In order to preserve positional information such that the network learns differe
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="A deep-dive into RoPE, and why it matters?"/>
 <meta name="twitter:description" content="What is Positional Encoding and why it matters?
-When training any large language model based on Transformers architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension Attention network where, the positional information between tokens aren&rsquo;t preserved natively, it&rsquo;s simply the representation of attention scores between each token (normalized by the $ \sqrt{\text{dim_len}} $ ).
+When training any large language model based on Transformers architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension Attention network where, the positional information between tokens aren&rsquo;t preserved natively, it&rsquo;s simply the representation of attention scores between each token (normalized by the $\sqrt{\text{dim_len}}$).
 In order to preserve positional information such that the network learns differently about &ldquo;Dog attacks the Cat&rdquo; and &ldquo;Cat attacks the Dog&rdquo;, we add a deterministic (remains the same throughout the network) encoding for each position across the dimensional embedding at each position."/>
 
 
@@ -117,12 +117,12 @@ In order to preserve positional information such that the network learns differe
   "@type": "BlogPosting",
   "headline": "A deep-dive into RoPE, and why it matters?",
   "name": "A deep-dive into RoPE, and why it matters?",
-  "description": "What is Positional Encoding and why it matters? When training any large language model based on Transformers architecture, our input token sequences tend to form a $(\\text{seq_len} \\times \\text{seq_len})$ dimension Attention network where, the positional information between tokens aren\u0026rsquo;t preserved natively, it\u0026rsquo;s simply the representation of attention scores between each token (normalized by the $ \\sqrt{\\text{dim_len}} $ ).\nIn order to preserve positional information such that the network learns differently about \u0026ldquo;Dog attacks the Cat\u0026rdquo; and \u0026ldquo;Cat attacks the Dog\u0026rdquo;, we add a deterministic (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.\n",
+  "description": "What is Positional Encoding and why it matters? When training any large language model based on Transformers architecture, our input token sequences tend to form a $(\\text{seq_len} \\times \\text{seq_len})$ dimension Attention network where, the positional information between tokens aren\u0026rsquo;t preserved natively, it\u0026rsquo;s simply the representation of attention scores between each token (normalized by the $\\sqrt{\\text{dim_len}}$).\nIn order to preserve positional information such that the network learns differently about \u0026ldquo;Dog attacks the Cat\u0026rdquo; and \u0026ldquo;Cat attacks the Dog\u0026rdquo;, we add a deterministic (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.\n",
   "keywords": [
     
   ],
-  "articleBody": "What is Positional Encoding and why it matters? When training any large language model based on Transformers architecture, our input token sequences tend to form a $(\\text{seq_len} \\times \\text{seq_len})$ dimension Attention network where, the positional information between tokens aren’t preserved natively, it’s simply the representation of attention scores between each token (normalized by the $ \\sqrt{\\text{dim_len}} $ ).\nIn order to preserve positional information such that the network learns differently about “Dog attacks the Cat” and “Cat attacks the Dog”, we add a deterministic (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.\nThe positional encoding recommended in Vaswani et al. 2017 was Sinusioidal Positional Encoding represented as: $$ PE_{pos, 2i} = \\sin(\\frac{pos}{10000^{\\frac{2i}{d_{model}}}}) $$ $$ PE_{pos, 2i+1} = \\cos(\\frac{pos}{10000^{\\frac{2i}{d_{model}}}}) $$\nwhere we apply pair-wise sine and cosine embedding to each of the consecutive embedding dimensions pair.\nThe term $ \\frac{2i}{d_{model}} $ forms an arithmetic progression from $ 0 $ to $ \\left( \\frac{d}{2} - 1 \\right)$ where $ d_{model} \\rightarrow \\text{embedding dimension of the model}. $\n$$ \\text{positional embedding} \\rightarrow \\vec{p_t}: \\begin{bmatrix} \\sin(w_1.t) \\ \\cos(w_1.t) \\ \\sin(w_2.t) \\ \\cos(w_2.t) \\ \\dots \\ \\sin(w_{\\frac{d}{2}}.t) \\ \\cos(w_{\\frac{d}{2}}.t) \\end{bmatrix}_{d \\times 1} $$\nCompared to using Binary Position Encoding and then utilizing the cycle of least significant bit (LSB) and most significant bit (MSB) [1], which switches abruptly between positional encoding values at different dimensional pairs, Sinusoidal Positional Embedding maintains a smooth flow between the positional encoding values for different dimensional pairs.\nWhy Rotary Positional Embedding (RoPE)? There are a few limitations even to Sinusoidal Positional Embedding that we wish to mitigate away.\nSinusoidal Positional Encoding allows relative position inference implicitly, but doesn’t preserve relative distance in dot-product space, making it suboptimal for models relying on attention similarity. [2] The similarity (dot-product) between two token embeddings varies with absolute positions, even if their relative distance stays the same. RoPE helps us mitigate through both of these limitations.\nConsider, the example from above, “Dog attacks the Cat”, in order to reliably encode the relative position between tokens, we need a positional embedding method such that the dot product to the applied embeddings for both “Dog” and “Cat” remains the same in both the examples, “Dog attacks the Cat” and “Once upon a time, a Dog attacks the Cat”, i.e., the dot product between two embeddings for tokens $ x_m $ and $ x_n $ depends only on their relative position to each other $ \\Delta = (m - n)$.\nRoPE encodes relative positional information in the attention dot product between entire query and key vectors, even though the operation is defined per 2D pair of dimensions.\nfor a d-dimensional embedding (say d = 768) RoPE partitions the input token vector $ \\vec{x} $ into $ \\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair. $$ R_{\\theta_{m,i}} = \\left( \\begin{array}{cccc} \\mathbf{R}{\\theta_0} \u0026 \u0026 \u0026 \\ \u0026 \\mathbf{R}{\\theta_1} \u0026 \u0026 \\ \u0026 \u0026 \\ddots \u0026 \\ \u0026 \u0026 \u0026 \\mathbf{R}{\\theta{d/2}} \\end{array} \\right) \\left( \\begin{array}{c} x_1 \\ x_2 \\ \\vdots \\ x_d \\end{array} \\right) $$\nwhere, each $ R_{\\theta_i}$ refers to a rotation matrix $ \\begin{pmatrix} \\cos(\\theta_i) \u0026 -\\sin(\\theta_i) \\ \\sin(\\theta_i) \u0026 cos(\\theta_i) \\end{pmatrix} $ for any given specific token position $m$.\nEach 2D operation operates independently, rotating a 2D subvector using a fixed frequency $ \\theta_i$.\nFor any attention network:\nQuery vector: $ q = W_q \\cdot x $ Key vector: $ k = W_k \\cdot x $ Value vector: $ v = W_v \\cdot x $ these are task-specific learned transformations, which adapt raw token embeddings to more useful subspaces for querying and reasoning.\nWe, then apply RoPE to these learned transformations, $$ R(m)q = R(m) \\cdot (W_q \\cdot x_m) \\ R(n)k = R(m) \\cdot (W_k \\cdot x_n) $$\nthe attention mechanism computes, $$ attn_{m,n} = q_m^T k_n = \\left{R(m) W_q x_m \\right}^T \\left{ R(n) W_k x_n \\right}$$ where, RoPE ensures that $ R(m)^T R(n) = R(n - m) $, i.e., the inner product depends only on $ \\Delta = (n - m) $ due to the properties of rotation matrices.\nHence, $ \\langle R(m)q, R(n)k \\rangle = \\langle R(n-m)q,k \\rangle$\nIn practice, we don’t use a matrix multiplication to compute RoPE to avoid computational inefficiency due to sparsity present in the matrix. Instead, we directly apply the rotations to pairs of elements independently, taking advantage of the regular pattern in the computation:\n$$ R_{\\boldsymbol{\\Theta}, p}^d \\mathbf{q} = \\begin{pmatrix} q_1 \\ q_2 \\ q_3 \\ q_4 \\ \\vdots \\ q_{d-1} \\ q_d \\end{pmatrix} \\otimes \\begin{pmatrix} \\cos(p\\theta_1) \\ \\cos(p\\theta_1) \\ \\cos(p\\theta_2) \\ \\cos(p\\theta_2) \\ \\vdots \\ \\cos(p\\theta_{d/2}) \\ \\cos(p\\theta_{d/2}) \\end{pmatrix} + \\begin{pmatrix} -q_2 \\ q_1 \\ -q_4 \\ q_3 \\ \\vdots \\ -q_d \\ q_{d-1} \\end{pmatrix} \\otimes \\begin{pmatrix} \\sin(p\\theta_1) \\ \\sin(p\\theta_1) \\ \\sin(p\\theta_2) \\ \\sin(p\\theta_2) \\ \\vdots \\ \\sin(p\\theta_{d/2}) \\ \\sin(p\\theta_{d/2}) \\end{pmatrix} $$\nPyTorch implementation import torch def apply_rope(token): \"\"\" Apply RoPE to a token tensor. token dimension: (batch_size, seq_len, d_model) \"\"\" dim = token.shape[-1] assert dim % 2 == 0, \"RoPE requires even number of dimensions\" half = dim // 2 freq = 1 / (10000 ** (torch.arange(0, half, device = token.device, dtype = token.dtype) / half)) position = torch.arange(token.size(1), device=token.device, dtype=token.dtype) theta = position.unsqueeze(-1) * freq sin = torch.sin(theta) cos = torch.cos(theta) # split the token into even and odd indices t_even = token[..., ::2] t_odd = token[..., 1::2] # Apply rotation (element-wise) rot_even = t_even * cos - t_odd * sin rot_odd = t_even * sin + t_odd * cos return torch.stack((rot_even, rot_odd), dim=-1).flatten(-2,-1) Intuition behind RoPE: Each token’s vector (after linear projection) is sliced into pairs of dimensions: $ [x_0, x_1] , [x_2, x_3], \\dots $ Each pair is rotated deterministically by a position-dependent angle $ \\theta_{m,i} $ where, $ \\theta_{m,i} $ is frequency-dependent for each token’s position $ m $. The rotation is mathematically equivalent to placing the pair on the unit circle and rotating it counter clockwise. $$ \\begin{bmatrix} \\cos(\\theta_{m,i}) \u0026 -\\sin(\\theta_{m,i}) \\ \\sin(\\theta_{m,i}) \u0026 \\cos(\\theta_{m,i}) \\end{bmatrix} \\cdot \\begin{bmatrix} x \\ y \\end{bmatrix} $$ For each plane i $ (0 ≤ i ≤ \\frac{d}{2}) $ the rotation angle for a token at position m is: $$ \\theta_{m,i} = m \\cdot \\frac{1}{10000^{\\frac{2i}{d}}} $$\n10000 is a base b (derived originally through multiple experimentations) Exponent decay: the denominator grows exponentially with i, so large i -\u003e tiny angle increments. Linear growth: the numerator grows linearly with m, so further tokens always rotate more. Now, if we consider each 2-D plane as a little clock hand: To complete a full $2\\pi$ rotation, we need: $$ \\theta_{m,i} = 2\\pi \\Rightarrow m\\frac{1}{10000^{\\frac{2i}{d}}} = 2\\pi $$ $$ m_i^{period} = 2\\pi \\cdot 10000^{\\frac{2i}{d}} $$\nplane index i period-length (how many tokens for 2π) 0 2π·10000⁰ = ≈ 6 tokens d/2−1 2π·10000^(1−2/d) ≈ tens-of-thousands of tokens Short-Range Structure High-frequency planes (small i) $ \\rightarrow$ changes phase quickly with small changes in m. Attention scores uses dot-products of rotated vectors; small positional shifts produce large cosine variations. Therefore, neighboring tokens produces very different activations in these planes $ \\rightarrow $ the model can resolve fine-grained local order. Long-Range Structure Low-frequency planes (large i) $ \\rightarrow$ changes phase extremely slowly. Tokens separated by large positions still have the almost same representation in these planes. Consequently, their dot-product (attention weight) is almost $ \\cos(0) = 1$, giving the model a smooth, gradually decaying bias towards distant tokens. RoPE’s attention scores satisfy $$ Attn(m, n) \\propto \\cos \\left( \\frac{\\left|m-n \\right|}{10000^{\\frac{2i}{d}}} \\right) $$ so the influence of a token at distance |m-n| decays gracefully without any hand-tuned masking.\nReferences Attention is All You Need: Vaswani et al. 2017 Self-Attention with Relative Position Representations: Shaw et al. [2018] RoFormer: Su et al. [2021] You could have designed state of the art positional encoding Positional Embeddings in Transformer Models: Evolution from Text to Vision Domains ",
-  "wordCount" : "1291",
+  "articleBody": "What is Positional Encoding and why it matters? When training any large language model based on Transformers architecture, our input token sequences tend to form a $(\\text{seq_len} \\times \\text{seq_len})$ dimension Attention network where, the positional information between tokens aren’t preserved natively, it’s simply the representation of attention scores between each token (normalized by the $\\sqrt{\\text{dim_len}}$).\nIn order to preserve positional information such that the network learns differently about “Dog attacks the Cat” and “Cat attacks the Dog”, we add a deterministic (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.\nThe positional encoding recommended in Vaswani et al. 2017 was Sinusioidal Positional Encoding represented as: $$ PE_{pos, 2i} = \\sin(\\frac{pos}{10000^{\\frac{2i}{d_{model}}}}) $$\n$$ PE_{pos, 2i+1} = \\cos(\\frac{pos}{10000^{\\frac{2i}{d_{model}}}}) $$\nwhere we apply pair-wise sine and cosine embedding to each of the consecutive embedding dimensions pair.\nThe term $\\frac{2i}{d_{model}}$ forms an arithmetic progression from $0$ to $\\left( \\frac{d}{2} - 1 \\right)$ where $d_{model} \\rightarrow$ embedding dimension of the model.\n$$ \\text{positional embedding} \\rightarrow \\vec{p_t}: \\begin{bmatrix} \\sin(w_1.t) \\\\ \\cos(w_1.t) \\\\ \\sin(w_2.t) \\\\ \\cos(w_2.t) \\\\ \\dots \\\\ \\sin(w_{\\frac{d}{2}}.t) \\\\ \\cos(w_{\\frac{d}{2}}.t) \\end{bmatrix}_{d \\times 1} $$\nCompared to using Binary Position Encoding and then utilizing the cycle of least significant bit (LSB) and most significant bit (MSB) [1], which switches abruptly between positional encoding values at different dimensional pairs, Sinusoidal Positional Embedding maintains a smooth flow between the positional encoding values for different dimensional pairs.\nWhy Rotary Positional Embedding (RoPE)? There are a few limitations even to Sinusoidal Positional Embedding that we wish to mitigate away.\nSinusoidal Positional Encoding allows relative position inference implicitly, but doesn’t preserve relative distance in dot-product space, making it suboptimal for models relying on attention similarity. [2] The similarity (dot-product) between two token embeddings varies with absolute positions, even if their relative distance stays the same. RoPE helps us mitigate through both of these limitations.\nConsider, the example from above, “Dog attacks the Cat”, in order to reliably encode the relative position between tokens, we need a positional embedding method such that the dot product to the applied embeddings for both “Dog” and “Cat” remains the same in both the examples, “Dog attacks the Cat” and “Once upon a time, a Dog attacks the Cat”, i.e., the dot product between two embeddings for tokens $x_m$ and $x_n$ depends only on their relative position to each other $\\Delta = (m - n)$.\nRoPE encodes relative positional information in the attention dot product between entire query and key vectors, even though the operation is defined per 2D pair of dimensions.\nfor a d-dimensional embedding (say d = 768) RoPE partitions the input token vector $\\vec{x}$ into $\\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair. $$ R_{\\theta_{m,i}} = \\left( \\begin{array}{cccc} \\mathbf{R}{\\theta_0} \u0026 \u0026 \u0026 \\\\ \u0026 \\mathbf{R}{\\theta_1} \u0026 \u0026 \\\\ \u0026 \u0026 \\ddots \u0026 \\\\ \u0026 \u0026 \u0026 \\mathbf{R}{\\theta{d/2}} \\end{array} \\right) \\left( \\begin{array}{c} x_1 \\\\ x_2 \\\\ \\vdots \\\\ x_d \\end{array} \\right) $$\nwhere, each $R_{\\theta_i}$ refers to a rotation matrix $$ \\begin{pmatrix} \\cos(\\theta_i) \u0026 -\\sin(\\theta_i) \\\\ \\sin(\\theta_i) \u0026 \\cos(\\theta_i) \\end{pmatrix} $$ for any given specific token position $m$.\nEach 2D operation operates independently, rotating a 2D subvector using a fixed frequency $\\theta_i$.\nFor any attention network:\nQuery vector: $q = W_q \\cdot x$ Key vector: $k = W_k \\cdot x$ Value vector: $v = W_v \\cdot x$ these are task-specific learned transformations, which adapt raw token embeddings to more useful subspaces for querying and reasoning.\nWe, then apply RoPE to these learned transformations, $$ R(m)q = R(m) \\cdot (W_q \\cdot x_m) $$ $$ R(n)k = R(m) \\cdot (W_k \\cdot x_n) $$\nthe attention mechanism computes, $$ attn_{m,n} = q_m^T k_n = \\left{R(m) W_q x_m \\right}^T \\left{ R(n) W_k x_n \\right} $$ where, RoPE ensures that $R(m)^T R(n) = R(n - m)$, i.e., the inner product depends only on $\\Delta = (n - m)$ due to the properties of rotation matrices.\nHence, $\\langle R(m)q, R(n)k \\rangle = \\langle R(n-m)q,k \\rangle$\nIn practice, we don’t use a matrix multiplication to compute RoPE to avoid computational inefficiency due to sparsity present in the matrix. Instead, we directly apply the rotations to pairs of elements independently, taking advantage of the regular pattern in the computation:\n$$ R_{\\boldsymbol{\\Theta}, p}^d \\mathbf{q} = \\begin{pmatrix} q_1 \\\\ q_2 \\\\ q_3 \\\\ q_4 \\\\ \\vdots \\\\ q_{d-1} \\\\ q_d \\end{pmatrix} \\otimes \\begin{pmatrix} \\cos(p\\theta_1) \\\\ \\cos(p\\theta_1) \\\\ \\cos(p\\theta_2) \\\\ \\cos(p\\theta_2) \\\\ \\vdots \\\\ \\cos(p\\theta_{d/2}) \\\\ \\cos(p\\theta_{d/2}) \\end{pmatrix} + \\begin{pmatrix} -q_2 \\\\ q_1 \\\\ -q_4 \\\\ q_3 \\\\ \\vdots \\\\ -q_d \\\\ q_{d-1} \\end{pmatrix} \\otimes \\begin{pmatrix} \\sin(p\\theta_1) \\\\ \\sin(p\\theta_1) \\\\ \\sin(p\\theta_2) \\\\ \\sin(p\\theta_2) \\\\ \\vdots \\\\ \\sin(p\\theta_{d/2}) \\\\ \\sin(p\\theta_{d/2}) \\end{pmatrix} $$\nPyTorch implementation import torch def apply_rope(token): \"\"\" Apply RoPE to a token tensor. token dimension: (batch_size, seq_len, d_model) \"\"\" dim = token.shape[-1] assert dim % 2 == 0, \"RoPE requires even number of dimensions\" half = dim // 2 freq = 1 / (10000 ** (torch.arange(0, half, device = token.device, dtype = token.dtype) / half)) position = torch.arange(token.size(1), device=token.device, dtype=token.dtype) theta = position.unsqueeze(-1) * freq sin = torch.sin(theta) cos = torch.cos(theta) # split the token into even and odd indices t_even = token[..., ::2] t_odd = token[..., 1::2] # Apply rotation (element-wise) rot_even = t_even * cos - t_odd * sin rot_odd = t_even * sin + t_odd * cos return torch.stack((rot_even, rot_odd), dim=-1).flatten(-2,-1) Intuition behind RoPE: Each token’s vector (after linear projection) is sliced into pairs of dimensions: $[x_0, x_1], [x_2, x_3], \\dots$ Each pair is rotated deterministically by a position-dependent angle $\\theta_{m,i}$ where, $\\theta_{m,i}$ is frequency-dependent for each token’s position $m$. The rotation is mathematically equivalent to placing the pair on the unit circle and rotating it counter clockwise. $$ \\begin{bmatrix} \\cos(\\theta_{m,i}) \u0026 -\\sin(\\theta_{m,i}) \\\\ \\sin(\\theta_{m,i}) \u0026 \\cos(\\theta_{m,i}) \\end{bmatrix} \\cdot \\begin{bmatrix} x \\\\ y \\end{bmatrix} $$ For each plane i $(0 ≤ i ≤ \\frac{d}{2})$ the rotation angle for a token at position m is: $$ \\theta_{m,i} = m \\cdot \\frac{1}{10000^{\\frac{2i}{d}}} $$\n10000 is a base b (derived originally through multiple experimentations) Exponent decay: the denominator grows exponentially with i, so large i -\u003e tiny angle increments. Linear growth: the numerator grows linearly with m, so further tokens always rotate more. Now, if we consider each 2-D plane as a little clock hand: To complete a full $2\\pi$ rotation, we need: $$ \\theta_{m,i} = 2\\pi \\Rightarrow m\\frac{1}{10000^{\\frac{2i}{d}}} = 2\\pi $$ $$ m_i^{period} = 2\\pi \\cdot 10000^{\\frac{2i}{d}} $$\nplane index i period-length (how many tokens for 2π) 0 2π·10000⁰ = ≈ 6 tokens d/2−1 2π·10000^(1−2/d) ≈ tens-of-thousands of tokens Short-Range Structure High-frequency planes (small i) $ \\rightarrow$ changes phase quickly with small changes in m. Attention scores uses dot-products of rotated vectors; small positional shifts produce large cosine variations. Therefore, neighboring tokens produces very different activations in these planes $ \\rightarrow $ the model can resolve fine-grained local order. Long-Range Structure Low-frequency planes (large i) $ \\rightarrow$ changes phase extremely slowly. Tokens separated by large positions still have the almost same representation in these planes. Consequently, their dot-product (attention weight) is almost $\\cos(0) = 1$, giving the model a smooth, gradually decaying bias towards distant tokens. RoPE’s attention scores satisfy $$ Attn(m, n) \\propto \\cos \\left( \\frac{\\left|m-n \\right|}{10000^{\\frac{2i}{d}}} \\right) $$ so the influence of a token at distance |m-n| decays gracefully without any hand-tuned masking.\nReferences Attention is All You Need: Vaswani et al. 2017 Self-Attention with Relative Position Representations: Shaw et al. [2018] RoFormer: Su et al. [2021] You could have designed state of the art positional encoding Positional Embeddings in Transformer Models: Evolution from Text to Vision Domains ",
+  "wordCount" : "1250",
   "inLanguage": "en",
   "datePublished": "2025-07-13T00:00:00Z",
   "dateModified": "2025-07-13T00:00:00Z",
@@ -208,7 +208,7 @@ In order to preserve positional information such that the network learns differe
     <h1 class="post-title entry-hint-parent">
       A deep-dive into RoPE, and why it matters?
     </h1>
-    <div class="post-meta"><span title='2025-07-13 00:00:00 +0000 UTC'>July 13, 2025</span>&nbsp;·&nbsp;7 min
+    <div class="post-meta"><span title='2025-07-13 00:00:00 +0000 UTC'>July 13, 2025</span>&nbsp;·&nbsp;6 min
 
 </div>
   </header> <div class="toc">
@@ -243,22 +243,26 @@ In order to preserve positional information such that the network learns differe
 </div>
 
   <div class="post-content"><h2 id="what-is-positional-encoding-and-why-it-matters">What is Positional Encoding and why it matters?<a hidden class="anchor" aria-hidden="true" href="#what-is-positional-encoding-and-why-it-matters">#</a></h2>
-<p>When training any large language model based on <strong>Transformers</strong> architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension <strong>Attention</strong> network where, the positional information between tokens aren&rsquo;t preserved natively, it&rsquo;s simply the representation of <strong>attention</strong> scores between each token (normalized by the $ \sqrt{\text{dim_len}} $ ).</p>
+<p>When training any large language model based on <strong>Transformers</strong> architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension <strong>Attention</strong> network where, the positional information between tokens aren&rsquo;t preserved natively, it&rsquo;s simply the representation of <strong>attention</strong> scores between each token (normalized by the $\sqrt{\text{dim_len}}$).</p>
 <p>In order to preserve positional information such that the network learns differently about <em>&ldquo;Dog attacks the Cat&rdquo;</em> and <em>&ldquo;Cat attacks the Dog&rdquo;</em>, we add a <strong>deterministic</strong> (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.</p>
 <p>The positional encoding recommended in <a href="https://arxiv.org/abs/1706.03762">Vaswani et al. 2017</a> was <strong>Sinusioidal Positional Encoding</strong> represented as:
-$$ PE_{pos, 2i} = \sin(\frac{pos}{10000^{\frac{2i}{d_{model}}}}) $$
-$$ PE_{pos, 2i+1} = \cos(\frac{pos}{10000^{\frac{2i}{d_{model}}}}) $$</p>
+$$
+PE_{pos, 2i} = \sin(\frac{pos}{10000^{\frac{2i}{d_{model}}}})
+$$</p>
+<p>$$
+PE_{pos, 2i+1} = \cos(\frac{pos}{10000^{\frac{2i}{d_{model}}}})
+$$</p>
 <p>where we apply pair-wise <em>sine</em> and <em>cosine</em> embedding to each of the consecutive embedding dimensions pair.</p>
-<p>The term $ \frac{2i}{d_{model}} $ forms an arithmetic progression from $ 0 $ to $ \left( \frac{d}{2} - 1 \right)$ where $ d_{model} \rightarrow \text{embedding dimension of the model}. $</p>
+<p>The term $\frac{2i}{d_{model}}$ forms an arithmetic progression from $0$ to $\left( \frac{d}{2} - 1 \right)$ where $d_{model} \rightarrow$ embedding dimension of the model.</p>
 <p>$$
 \text{positional embedding} \rightarrow \vec{p_t}:
 \begin{bmatrix}
-\sin(w_1.t) \
-\cos(w_1.t) \
-\sin(w_2.t) \
-\cos(w_2.t) \
-\dots \
-\sin(w_{\frac{d}{2}}.t) \
+\sin(w_1.t) \\
+\cos(w_1.t) \\
+\sin(w_2.t) \\
+\cos(w_2.t) \\
+\dots \\
+\sin(w_{\frac{d}{2}}.t) \\
 \cos(w_{\frac{d}{2}}.t)
 \end{bmatrix}_{d \times 1}
 $$</p>
@@ -270,91 +274,100 @@ $$</p>
 <li>The similarity (dot-product) between two token embeddings varies with absolute positions, even if their relative distance stays the same.</li>
 </ol>
 <p><strong>RoPE</strong> helps us mitigate through both of these limitations.</p>
-<p>Consider, the example from above, <em>&ldquo;Dog attacks the Cat&rdquo;</em>, in order to reliably encode the relative position between tokens, we need a positional embedding method such that the dot product to the applied embeddings for both <em>&ldquo;Dog&rdquo;</em> and <em>&ldquo;Cat&rdquo;</em> remains the same in both the examples, <em>&ldquo;Dog attacks the Cat&rdquo;</em> and <em>&ldquo;Once upon a time, a Dog attacks the Cat&rdquo;</em>, i.e., the dot product between two embeddings for tokens $ x_m $ and $ x_n $ depends only on their relative position to each other $ \Delta = (m - n)$.</p>
+<p>Consider, the example from above, <em>&ldquo;Dog attacks the Cat&rdquo;</em>, in order to reliably encode the relative position between tokens, we need a positional embedding method such that the dot product to the applied embeddings for both <em>&ldquo;Dog&rdquo;</em> and <em>&ldquo;Cat&rdquo;</em> remains the same in both the examples, <em>&ldquo;Dog attacks the Cat&rdquo;</em> and <em>&ldquo;Once upon a time, a Dog attacks the Cat&rdquo;</em>, i.e., the dot product between two embeddings for tokens $x_m$ and $x_n$ depends only on their relative position to each other $\Delta = (m - n)$.</p>
 <p>RoPE encodes relative positional information in the <em>attention dot product</em> between entire query and key vectors, even though the operation is defined per 2D pair of dimensions.</p>
 <ul>
 <li>for a <strong>d-dimensional embedding</strong> (say d = 768)
-<strong>RoPE</strong> partitions the input token vector $ \vec{x} $ into $ \frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair.</li>
+<strong>RoPE</strong> partitions the input token vector $\vec{x}$ into $\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair.</li>
 </ul>
 <p>$$
 R_{\theta_{m,i}} =
 \left(
 \begin{array}{cccc}
-\mathbf{R}<em>{\theta_0} &amp; &amp; &amp; \
-&amp; \mathbf{R}</em>{\theta_1} &amp; &amp; \
-&amp; &amp; \ddots &amp; \
+\mathbf{R}<em>{\theta_0} &amp; &amp; &amp; \\
+&amp; \mathbf{R}</em>{\theta_1} &amp; &amp; \\
+&amp; &amp; \ddots &amp; \\
 &amp; &amp; &amp; \mathbf{R}<em>{\theta</em>{d/2}}
 \end{array}
 \right)
 \left(
 \begin{array}{c}
-x_1 \
-x_2 \
-\vdots \
+x_1 \\
+x_2 \\
+\vdots \\
 x_d
 \end{array}
 \right)
 $$</p>
-<p>where, each $ R_{\theta_i}$ refers to a rotation matrix $ \begin{pmatrix}
-\cos(\theta_i) &amp; -\sin(\theta_i) \
-\sin(\theta_i) &amp;  cos(\theta_i)
+<p>where, each $R_{\theta_i}$ refers to a rotation matrix
+$$
+\begin{pmatrix}
+\cos(\theta_i) &amp; -\sin(\theta_i) \\
+\sin(\theta_i) &amp;  \cos(\theta_i)
 \end{pmatrix}
-$ for any given specific token position $m$.</p>
-<p>Each 2D operation operates independently, rotating a 2D subvector using a fixed frequency $ \theta_i$.</p>
+$$
+for any given specific token position $m$.</p>
+<p>Each 2D operation operates independently, rotating a 2D subvector using a fixed frequency $\theta_i$.</p>
 <p>For any attention network:</p>
 <ul>
-<li>Query vector: $ q = W_q \cdot x $</li>
-<li>Key vector: $ k = W_k \cdot x $</li>
-<li>Value vector: $ v = W_v \cdot x $</li>
+<li>Query vector: $q = W_q \cdot x$</li>
+<li>Key vector: $k = W_k \cdot x$</li>
+<li>Value vector: $v = W_v \cdot x$</li>
 </ul>
 <p>these are task-specific learned transformations, which adapt raw token embeddings to more useful subspaces for querying and reasoning.</p>
 <p>We, then apply RoPE to these learned transformations,
-$$ R(m)q = R(m) \cdot (W_q \cdot x_m) \
-R(n)k  = R(m) \cdot (W_k \cdot x_n) $$</p>
+$$
+R(m)q = R(m) \cdot (W_q \cdot x_m)
+$$
+$$
+R(n)k  = R(m) \cdot (W_k \cdot x_n)
+$$</p>
 <p>the attention mechanism computes,
-$$ attn_{m,n} = q_m^T k_n = \left{R(m) W_q x_m \right}^T \left{ R(n) W_k x_n \right}$$
-where, <strong>RoPE</strong> ensures that $ R(m)^T R(n) = R(n - m) $, i.e., the inner product depends only on $ \Delta = (n - m) $ due to the properties of rotation matrices.</p>
-<p>Hence, $ \langle R(m)q, R(n)k \rangle = \langle R(n-m)q,k \rangle$</p>
+$$
+attn_{m,n} = q_m^T k_n = \left{R(m) W_q x_m \right}^T \left{ R(n) W_k x_n \right}
+$$
+where, <strong>RoPE</strong> ensures that $R(m)^T R(n) = R(n - m)$, i.e., the inner product depends only on $\Delta = (n - m)$ due to the properties of rotation matrices.</p>
+<p>Hence, $\langle R(m)q, R(n)k \rangle = \langle R(n-m)q,k \rangle$</p>
 <p>In practice, we don&rsquo;t use a matrix multiplication to compute RoPE to avoid computational inefficiency due to sparsity present in the matrix. Instead, we directly apply the rotations to pairs of elements independently, taking advantage of the regular pattern in the computation:</p>
 <p>$$
 R_{\boldsymbol{\Theta}, p}^d \mathbf{q} =
 \begin{pmatrix}
-q_1 \
-q_2 \
-q_3 \
-q_4 \
-\vdots \
-q_{d-1} \
+q_1 \\
+q_2 \\
+q_3 \\
+q_4 \\
+\vdots \\
+q_{d-1} \\
 q_d
 \end{pmatrix}
 \otimes
 \begin{pmatrix}
-\cos(p\theta_1) \
-\cos(p\theta_1) \
-\cos(p\theta_2) \
-\cos(p\theta_2) \
-\vdots \
-\cos(p\theta_{d/2}) \
+\cos(p\theta_1) \\
+\cos(p\theta_1) \\
+\cos(p\theta_2) \\
+\cos(p\theta_2) \\
+\vdots \\
+\cos(p\theta_{d/2}) \\
 \cos(p\theta_{d/2})
 \end{pmatrix}
 +
 \begin{pmatrix}
--q_2 \
-q_1 \
--q_4 \
-q_3 \
-\vdots \
--q_d \
+-q_2 \\
+q_1 \\
+-q_4 \\
+q_3 \\
+\vdots \\
+-q_d \\
 q_{d-1}
 \end{pmatrix}
 \otimes
 \begin{pmatrix}
-\sin(p\theta_1) \
-\sin(p\theta_1) \
-\sin(p\theta_2) \
-\sin(p\theta_2) \
-\vdots \
-\sin(p\theta_{d/2}) \
+\sin(p\theta_1) \\
+\sin(p\theta_1) \\
+\sin(p\theta_2) \\
+\sin(p\theta_2) \\
+\vdots \\
+\sin(p\theta_{d/2}) \\
 \sin(p\theta_{d/2})
 \end{pmatrix}
 $$</p>
@@ -390,22 +403,22 @@ $$</p>
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> torch<span style="color:#f92672">.</span>stack((rot_even, rot_odd), dim<span style="color:#f92672">=-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">.</span>flatten(<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>,<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
 </span></span></code></pre></div><h3 id="intuition-behind-rope">Intuition behind RoPE:<a hidden class="anchor" aria-hidden="true" href="#intuition-behind-rope">#</a></h3>
 <ol>
-<li>Each token&rsquo;s vector (after linear projection) is sliced into pairs of dimensions: $ [x_0, x_1] , [x_2, x_3], \dots $</li>
-<li>Each pair is rotated deterministically by a position-dependent angle $ \theta_{m,i} $ where, $ \theta_{m,i} $ is frequency-dependent for each token&rsquo;s position $ m $.</li>
+<li>Each token&rsquo;s vector (after linear projection) is sliced into pairs of dimensions: $[x_0, x_1], [x_2, x_3], \dots$</li>
+<li>Each pair is rotated deterministically by a position-dependent angle $\theta_{m,i}$ where, $\theta_{m,i}$ is frequency-dependent for each token&rsquo;s position $m$.</li>
 <li>The rotation is mathematically equivalent to placing the pair on the unit circle and rotating it counter clockwise.
 $$
 \begin{bmatrix}
-\cos(\theta_{m,i}) &amp; -\sin(\theta_{m,i}) \
+\cos(\theta_{m,i}) &amp; -\sin(\theta_{m,i}) \\
 \sin(\theta_{m,i}) &amp;  \cos(\theta_{m,i})
 \end{bmatrix}
 \cdot
 \begin{bmatrix}
-x \
+x \\
 y
 \end{bmatrix}
 $$</li>
 </ol>
-<p>For each plane <em>i</em> $ (0 ≤ i ≤ \frac{d}{2}) $ the rotation angle for a token at position <em>m</em> is:
+<p>For each plane <em>i</em> $(0 ≤ i ≤ \frac{d}{2})$ the rotation angle for a token at position <em>m</em> is:
 $$
 \theta_{m,i} = m \cdot \frac{1}{10000^{\frac{2i}{d}}}
 $$</p>
@@ -416,8 +429,12 @@ $$</p>
 </ul>
 <p>Now, if we consider each 2-D plane as a little clock hand: <br>
 To complete a full $2\pi$ rotation, we need:
-$$ \theta_{m,i} = 2\pi \Rightarrow m\frac{1}{10000^{\frac{2i}{d}}} = 2\pi $$
-$$ m_i^{period} = 2\pi \cdot 10000^{\frac{2i}{d}} $$</p>
+$$
+\theta_{m,i} = 2\pi \Rightarrow m\frac{1}{10000^{\frac{2i}{d}}} = 2\pi
+$$
+$$
+m_i^{period} = 2\pi \cdot 10000^{\frac{2i}{d}}
+$$</p>
 <table>
   <thead>
       <tr>
@@ -446,10 +463,12 @@ $$ m_i^{period} = 2\pi \cdot 10000^{\frac{2i}{d}} $$</p>
 <ul>
 <li><strong>Low-frequency planes</strong> (large <em>i</em>) $ \rightarrow$ changes phase extremely slowly.</li>
 <li>Tokens separated by large positions still have the almost same representation in these planes.</li>
-<li>Consequently, their dot-product (attention weight) is almost $ \cos(0) = 1$, giving the model a <strong>smooth, gradually decaying bias towards distant tokens</strong>.</li>
+<li>Consequently, their dot-product (attention weight) is almost $\cos(0) = 1$, giving the model a <strong>smooth, gradually decaying bias towards distant tokens</strong>.</li>
 </ul>
 <p><strong>RoPE</strong>&rsquo;s attention scores satisfy
-$$ Attn(m, n) \propto \cos \left( \frac{\left|m-n \right|}{10000^{\frac{2i}{d}}} \right) $$
+$$
+Attn(m, n) \propto \cos \left( \frac{\left|m-n \right|}{10000^{\frac{2i}{d}}} \right)
+$$
 so the influence of a token at distance |m-n| decays gracefully without any hand-tuned masking.</p>
 <h2 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h2>
 <ol>

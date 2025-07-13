@@ -14,7 +14,7 @@
       <pubDate>Sun, 13 Jul 2025 00:00:00 +0000</pubDate>
       <guid>https://shreyashkar-ml.github.io/posts/rope/</guid>
       <description>&lt;h2 id=&#34;what-is-positional-encoding-and-why-it-matters&#34;&gt;What is Positional Encoding and why it matters?&lt;/h2&gt;
-&lt;p&gt;When training any large language model based on &lt;strong&gt;Transformers&lt;/strong&gt; architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension &lt;strong&gt;Attention&lt;/strong&gt; network where, the positional information between tokens aren&amp;rsquo;t preserved natively, it&amp;rsquo;s simply the representation of &lt;strong&gt;attention&lt;/strong&gt; scores between each token (normalized by the $ \sqrt{\text{dim_len}} $ ).&lt;/p&gt;
+&lt;p&gt;When training any large language model based on &lt;strong&gt;Transformers&lt;/strong&gt; architecture, our input token sequences tend to form a $(\text{seq_len} \times \text{seq_len})$ dimension &lt;strong&gt;Attention&lt;/strong&gt; network where, the positional information between tokens aren&amp;rsquo;t preserved natively, it&amp;rsquo;s simply the representation of &lt;strong&gt;attention&lt;/strong&gt; scores between each token (normalized by the $\sqrt{\text{dim_len}}$).&lt;/p&gt;
 &lt;p&gt;In order to preserve positional information such that the network learns differently about &lt;em&gt;&amp;ldquo;Dog attacks the Cat&amp;rdquo;&lt;/em&gt; and &lt;em&gt;&amp;ldquo;Cat attacks the Dog&amp;rdquo;&lt;/em&gt;, we add a &lt;strong&gt;deterministic&lt;/strong&gt; (remains the same throughout the network) encoding for each position across the dimensional embedding at each position.&lt;/p&gt;</description>
     </item>
     <item>
