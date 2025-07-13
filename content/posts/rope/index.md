@@ -170,31 +170,32 @@ import torch
 
 def apply_rope(token):
     """
-    Apply RoPE to a token tensor.
-    token dimension: (batch_size, seq_len, d_model)
+    Apply Rotary Positional Embedding (RoPE).
+    token shape: (batch_size, seq_len, d_model)
     """
     dim = token.shape[-1]
     assert dim % 2 == 0, "RoPE requires even number of dimensions"
 
     half = dim // 2
-    freq = 1 / (10000 ** (torch.arange(0, half, device = token.device, dtype = token.dtype) / half))
-
+    freq = 1 / (10000 ** (torch.arange(0, half, device=token.device, dtype=token.dtype) / half))
     position = torch.arange(token.size(1), device=token.device, dtype=token.dtype)
 
-    theta = position.unsqueeze(-1) * freq
+    theta = position[:, None] * freq[None, :]   # shape: (seq_len, half)
 
-    sin = torch.sin(theta)
-    cos = torch.cos(theta)
+    sin = torch.sin(theta).unsqueeze(0)         # shape: (1, seq_len, half)
+    cos = torch.cos(theta).unsqueeze(0)         # shape: (1, seq_len, half)
 
-    # split the token into even and odd indices
     t_even = token[..., ::2]
     t_odd = token[..., 1::2]
 
-    # Apply rotation (element-wise)
     rot_even = t_even * cos - t_odd * sin
     rot_odd = t_even * sin + t_odd * cos
 
-    return torch.stack((rot_even, rot_odd), dim=-1).flatten(-2,-1)
+    rotated = torch.empty_like(token)
+    rotated[..., ::2] = rot_even
+    rotated[..., 1::2] = rot_odd
+
+    return rotated
 ```
 
 
