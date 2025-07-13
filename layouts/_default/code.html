@@ -15,17 +15,8 @@
 
 {{ if site.Data.projects }}
   {{ range site.Data.projects.projects }}
-    <article class="post-entry">
-      <header class="entry-header">
-        <h2 class="entry-hint-parent">
-          {{- .title }}
-        </h2>
-      </header>
-      <div class="entry-content">
-        <p>{{ .description }}</p>
-      </div>
-      <a class="entry-link" aria-label="post link to {{ .title | plainify }}" href="{{ .url }}" target="_blank" rel="noopener noreferrer"></a>
-    </article>
+    <h2><a href="{{ .url }}" target="_blank" rel="noopener noreferrer">{{ .title }}</a></h2>
+    <p>{{ .description }}</p>
   {{ end }}
 {{ end }}
 
