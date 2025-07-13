@@ -55,7 +55,7 @@ RoPE encodes relative positional information in the *attention dot product* betw
 - for a **d-dimensional embedding** (say d = 768)
 **RoPE** partitions the input token vector $\vec{x}$ into $\frac{d}{2}$ disjoint 2D subspaces, and applies a position dependent relation to each pair.
 $$
-R_{ \theta_{m,i} } =
+R_{\theta_{m,i}} =
 \left(
 \begin{array}{cccc}
 \mathbf{R}_{\theta_0} & & & \\\\
@@ -99,10 +99,7 @@ $$
 R(n)k  = R(m) \cdot (W_k \cdot x_n)
 $$
 
-the attention mechanism computes,
-$$
-attn_{m,n} = q_m^T k_n = \left\{R(m) W_q x_m \right\}^T \left\{ R(n) W_k x_n \right\}
-$$
+the attention mechanism computes, $$attn_{m,n} = q_m^T k_n = \left\{ R(m) W_q x_m \right\}^T \left\{ R(n) W_k x_n \right\}$$
 where, **RoPE** ensures that $R(m)^T R(n) = R(n - m)$, i.e., the inner product depends only on $\Delta = (n - m)$ due to the properties of rotation matrices.
 
 Hence, $\langle R(m)q, R(n)k \rangle = \langle R(n-m)q,k \rangle$
