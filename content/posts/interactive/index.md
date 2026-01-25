@@ -10,7 +10,7 @@ This page hosts interactive visuals that pair with the Muon optimizer post. Ever
 
 ## Interactive 1: Traditional SGD on a quadratic bowl
 
-This is a 2D quadratic loss (elliptical contours). The blue polyline is the sequence of SGD steps from the green start point to the orange end point. Increase the learning rate to see faster progress (and potential overshoot), raise the step count to lengthen the trajectory, and move the start point to sample different regions of curvature.
+This is a simple 2D loss landscape with elliptical contours (lower is better). The blue path shows gradient descent updates with a single global step size, moving from the start (green) toward the minimum (orange). Increase the learning rate to see larger jumps (faster progress but more overshoot), and raise the step count to see how smaller steps trace the contours more tightly.
 
 <div class="ml-interactive" data-ml="sgd-basic">
   <div class="ml-controls">
@@ -54,9 +54,9 @@ This is a 2D quadratic loss (elliptical contours). The blue polyline is the sequ
 
 ## Interactive 2: Ill-conditioning and gradient scaling
 
-This bowl has very different curvature along each axis. The same global learning rate produces zig-zagging updates, while a simple per-coordinate rescaling stabilizes the path.
+This loss landscape has very different curvature along each axis (steep in one direction, flat in the other). A single global step size causes zig-zagging across the steep direction, while a simple per-coordinate rescaling balances the effective step and stabilizes the path.
 
-Use the curvature ratio to control how stretched the contours are (higher means worse conditioning). The orange path is plain SGD with a single learning rate; the green path divides each gradient coordinate by its curvature so it behaves more like a well-conditioned problem. Compare the two paths as you change the learning rate and step count.
+Use the curvature ratio to control how anisotropic the loss landscape is (higher means one direction is much steeper). The orange path is plain SGD with a single step size, which zig-zags across the steep direction. The green path rescales coordinates to balance the effective step, so it moves more directly toward the minimum. Try modest learning rates to see the contrast clearly. For high ratios, learning rates at or below 0.03 keep the comparison stable.
 
 <div class="ml-interactive" data-ml="sgd-scaling">
   <div class="ml-controls">
@@ -67,7 +67,7 @@ Use the curvature ratio to control how stretched the contours are (higher means 
     </label>
     <label>
       Learning rate
-      <input type="range" min="0.01" max="0.4" value="0.12" step="0.01" data-role="lr" />
+      <input type="range" min="0.005" max="0.1" value="0.03" step="0.005" data-role="lr" />
       <span class="ml-readout" data-role="lr-val">0.12</span>
     </label>
     <label>
@@ -92,9 +92,9 @@ Use the curvature ratio to control how stretched the contours are (higher means 
 
 ## Interactive 3: Momentum slider
 
-Momentum averages gradients over time and can reduce zig-zagging on ill-conditioned bowls. Try increasing the momentum value and watch the path straighten.
+Momentum averages gradients over time and can reduce zig-zagging on ill-conditioned loss landscapes. Increasing beta smooths the update direction; at a fixed (stable) learning rate, the path straightens along the shallow direction instead of bouncing across the steep axis.
 
-Here, both paths use the same learning rate and number of steps. The gray line is vanilla SGD; the blue line adds momentum with coefficient beta. Higher beta means stronger smoothing of gradients, which typically reduces oscillation across the steep axis.
+Here, both paths use the same learning rate and number of steps. The gray line is vanilla SGD; the blue line adds momentum with coefficient beta. Higher beta means stronger smoothing of gradients, which typically reduces oscillation across the steep axis when the learning rate is in a stable range. For clearer behavior, try learning rates at or below 0.05.
 
 <div class="ml-interactive" data-ml="sgd-momentum">
   <div class="ml-controls">
@@ -105,7 +105,7 @@ Here, both paths use the same learning rate and number of steps. The gray line i
     </label>
     <label>
       Learning rate
-      <input type="range" min="0.01" max="0.3" value="0.12" step="0.01" data-role="lr" />
+      <input type="range" min="0.005" max="0.08" value="0.03" step="0.005" data-role="lr" />
       <span class="ml-readout" data-role="lr-val">0.12</span>
     </label>
     <label>
@@ -130,7 +130,7 @@ Here, both paths use the same learning rate and number of steps. The gray line i
 
 ## Interactive 4: Operator norm + polar factor (Muon intuition)
 
-We visualize a 2×2 weight matrix acting on the unit circle. The spectral norm is the maximum stretch. The polar factor removes stretching while preserving rotation, echoing Muon’s “orthogonalized” update.
+We visualize a 2ï¿½2 weight matrix acting on the unit circle. The spectral norm is the maximum stretch. The polar factor removes stretching while preserving rotation, echoing Muonï¿½s ï¿½orthogonalizedï¿½ update.
 
 The sliders labeled a, b, c, d are the entries of the weight matrix
 `W = [[a, b], [c, d]]`. The orange curve shows how W stretches the unit circle; the green curve shows the closest orthogonal (polar) factor that preserves rotation but removes stretching. The dashed ring is an RMS gain guide that scales with fan-in/out via `sigma_max * sqrt(n/m)`; as you change n and m, the ring (and scale) adjusts even if the matrix entries stay fixed.
@@ -179,8 +179,8 @@ The sliders labeled a, b, c, d are the entries of the weight matrix
   </svg>
   <div class="ml-legend">
     <span class="ml-chip"><span class="ml-dot" style="background:#adb5bd"></span>unit circle</span>
-    <span class="ml-chip"><span class="ml-dot" style="background:#d9480f"></span>W · circle</span>
-    <span class="ml-chip"><span class="ml-dot" style="background:#2b8a3e"></span>polar(W) · circle</span>
+    <span class="ml-chip"><span class="ml-dot" style="background:#d9480f"></span>W ï¿½ circle</span>
+    <span class="ml-chip"><span class="ml-dot" style="background:#2b8a3e"></span>polar(W) ï¿½ circle</span>
     <span class="ml-chip"><span class="ml-dot" style="background:#845ef7"></span>RMS gain ring</span>
     <span class="ml-chip">s_max: <span class="ml-readout" data-role="sigma">0.00</span></span>
     <span class="ml-chip">RMS gain: <span class="ml-readout" data-role="rms">0.00</span></span>
@@ -362,8 +362,8 @@ The sliders labeled a, b, c, d are the entries of the weight matrix
     for (var i = 0; i < steps; i += 1) {
       var gx = a * x;
       var gy = b * y;
-      vx = beta * vx + gx;
-      vy = beta * vy + gy;
+      vx = beta * vx + (1 - beta) * gx;
+      vy = beta * vy + (1 - beta) * gy;
       x -= lr * vx;
       y -= lr * vy;
       pts.push({ x: x, y: y });
@@ -523,7 +523,7 @@ The sliders labeled a, b, c, d are the entries of the weight matrix
       lrVal.textContent = lr.toFixed(2);
       stepsVal.textContent = String(steps);
 
-      var a = 30.0;
+      var a = 20.0;
       var b = 1.0;
       var x0 = 2.5;
       var y0 = 2.0;
