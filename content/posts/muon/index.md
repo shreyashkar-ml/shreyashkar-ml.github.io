@@ -39,9 +39,10 @@ With a given learning rate of $\alpha$, this becomes:
 
 $\theta_{t+1} = \theta_t - \alpha g_t$
 
+<div style="margin-left: 2em; font-size: 0.85em;"><em>
 Let's take a look at a 2D quadratic loss (elliptical contours) tracing a SGD path. The blue polyline is the sequence of SGD steps from the start (green) to orange (end).
 
-Increasing the learning rate here leads to faster progress (and potential overshoot), raising the step count lengthens the trajectory, and moving the start point samples different regions of the curvature.
+Increasing the learning rate here leads to faster progress (and potential overshoot), raising the step count lengthens the trajectory, and moving the start point samples different regions of the curvature.</em></div>
 
 <div class="ml-interactive" data-ml="sgd-basic">
   <div class="ml-controls">
@@ -100,9 +101,9 @@ To expand on the problem, consider a deep network with varying gradient scales s
 * Too large $\implies \theta_2$ explodes
 * Too small $\implies \theta_1$ barely moves
 
-Let's take a look at a loss landscape with very different curvature along each axis (steep in one direction, flat in the other). The same global learning rate principle from SGD produces zig-zagging updates here, while a simple per-coordinate rescaling stabilizes the path.
+<div style="margin-left: 2em; font-size: 0.85em;"><em>Let's take a look at a loss landscape with very different curvature along each axis (steep in one direction, flat in the other). The same global learning rate principle from SGD produces zig-zagging updates here, while a simple per-coordinate rescaling stabilizes the path.
 
-The curvature ratio controls how anisotropic the loss landscape is (higher means one direction is much steeper), we can compare both plain SGD and coordinate-scaled learning here.
+The curvature ratio controls how anisotropic the loss landscape is (higher means one direction is much steeper), we can compare both plain SGD and coordinate-scaled learning here.</em></div>
 
 <div class="ml-interactive" data-ml="sgd-scaling">
   <div class="ml-controls">
@@ -170,7 +171,7 @@ In Adam, $d_i$ is taken to be roughly $\sqrt{\hat{s}_{t,i}} + \epsilon$ (a smoot
 
 Now, that we have established Adam as steepest descent under a diagonal coordinate-wise scaled metric.
 
-Let's take a look at how momentum averages gradients over time and can reduce zig-zagging on ill-conditioned loss landscapes. Increasing beta smooths the update direction; at a fixed (stable) learning rate, the path straightens along the shallow direction instead of bouncing across the steep axis.
+<div style="margin-left: 2em; font-size: 0.85em;"><em>Let's take a look at how momentum averages gradients over time and can reduce zig-zagging on ill-conditioned loss landscapes. Increasing beta smooths the update direction; at a fixed (stable) learning rate, the path straightens along the shallow direction instead of bouncing across the steep axis.</em></div>
 
 <div class="ml-interactive" data-ml="sgd-momentum">
   <div class="ml-controls">
@@ -353,10 +354,10 @@ where:
 
 An intuition to orthogonalization is *discarding the stretch, retaining the rotation*.
 
-Let's visualize a $ 2 \times 2$ weight matrix acting on the unit circle. The spectral norm is the maximum stretch. The polar factor removes stretching while preserving rotation, echoing Muon's orthogonalized update.
+<div style="margin-left: 2em; font-size: 0.85em;"><em>Let's visualize a $ 2 \times 2$ weight matrix acting on the unit circle. The spectral norm is the maximum stretch. The polar factor removes stretching while preserving rotation, echoing Muon's orthogonalized update.
 
 The sliders labeled a, b, c, d are the entries of the weight matrix
-`W = [[a, b], [c, d]]`. The orange curve shows how W stretches the unit circle; the green curve shows the closest orthogonal (polar) factor that preserves rotation but removes stretching. The dashed ring is an RMS gain guide that scales with fan-in/out via `sigma_max * sqrt(n/m)`; as we change n and m, the ring (and scale) adjusts even if the matrix entries stay fixed.
+`W = [[a, b], [c, d]]`. The orange curve shows how W stretches the unit circle; the green curve shows the closest orthogonal (polar) factor that preserves rotation but removes stretching. The dashed ring is an RMS gain guide that scales with fan-in/out via `sigma_max * sqrt(n/m)`; as we change n and m, the ring (and scale) adjusts even if the matrix entries stay fixed.</em></div>
 
 <div class="ml-interactive" data-ml="operator-norm">
   <div class="ml-controls">
@@ -402,8 +403,8 @@ The sliders labeled a, b, c, d are the entries of the weight matrix
   </svg>
   <div class="ml-legend">
     <span class="ml-chip"><span class="ml-dot" style="background:#adb5bd"></span>unit circle</span>
-    <span class="ml-chip"><span class="ml-dot" style="background:#d9480f"></span>W � circle</span>
-    <span class="ml-chip"><span class="ml-dot" style="background:#2b8a3e"></span>polar(W) � circle</span>
+    <span class="ml-chip"><span class="ml-dot" style="background:#d9480f"></span>W circle</span>
+    <span class="ml-chip"><span class="ml-dot" style="background:#2b8a3e"></span>polar(W) circle</span>
     <span class="ml-chip"><span class="ml-dot" style="background:#845ef7"></span>RMS gain ring</span>
     <span class="ml-chip">s_max: <span class="ml-readout" data-role="sigma">0.00</span></span>
     <span class="ml-chip">RMS gain: <span class="ml-readout" data-role="rms">0.00</span></span>
