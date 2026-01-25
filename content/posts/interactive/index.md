@@ -10,6 +10,8 @@ This page hosts interactive visuals that pair with the Muon optimizer post. Ever
 
 ## Interactive 1: Traditional SGD on a quadratic bowl
 
+This is a 2D quadratic loss (elliptical contours). The blue polyline is the sequence of SGD steps from the green start point to the orange end point. Increase the learning rate to see faster progress (and potential overshoot), raise the step count to lengthen the trajectory, and move the start point to sample different regions of curvature.
+
 <div class="ml-interactive" data-ml="sgd-basic">
   <div class="ml-controls">
     <label>
@@ -54,6 +56,8 @@ This page hosts interactive visuals that pair with the Muon optimizer post. Ever
 
 This bowl has very different curvature along each axis. The same global learning rate produces zig-zagging updates, while a simple per-coordinate rescaling stabilizes the path.
 
+Use the curvature ratio to control how stretched the contours are (higher means worse conditioning). The orange path is plain SGD with a single learning rate; the green path divides each gradient coordinate by its curvature so it behaves more like a well-conditioned problem. Compare the two paths as you change the learning rate and step count.
+
 <div class="ml-interactive" data-ml="sgd-scaling">
   <div class="ml-controls">
     <label>
@@ -90,6 +94,8 @@ This bowl has very different curvature along each axis. The same global learning
 
 Momentum averages gradients over time and can reduce zig-zagging on ill-conditioned bowls. Try increasing the momentum value and watch the path straighten.
 
+Here, both paths use the same learning rate and number of steps. The gray line is vanilla SGD; the blue line adds momentum with coefficient beta. Higher beta means stronger smoothing of gradients, which typically reduces oscillation across the steep axis.
+
 <div class="ml-interactive" data-ml="sgd-momentum">
   <div class="ml-controls">
     <label>
@@ -125,6 +131,9 @@ Momentum averages gradients over time and can reduce zig-zagging on ill-conditio
 ## Interactive 4: Operator norm + polar factor (Muon intuition)
 
 We visualize a 2×2 weight matrix acting on the unit circle. The spectral norm is the maximum stretch. The polar factor removes stretching while preserving rotation, echoing Muon’s “orthogonalized” update.
+
+The sliders labeled a, b, c, d are the entries of the weight matrix
+`W = [[a, b], [c, d]]`. The orange curve shows how W stretches the unit circle; the green curve shows the closest orthogonal (polar) factor that preserves rotation but removes stretching. The dashed ring is an RMS gain guide that scales with fan-in/out via `sigma_max * sqrt(n/m)`; as you change n and m, the ring (and scale) adjusts even if the matrix entries stay fixed.
 
 <div class="ml-interactive" data-ml="operator-norm">
   <div class="ml-controls">
@@ -166,13 +175,15 @@ We visualize a 2×2 weight matrix acting on the unit circle. The spectral norm is
     <path data-role="unit" fill="none" stroke="#adb5bd" stroke-width="2"></path>
     <path data-role="mapped" fill="none" stroke="#d9480f" stroke-width="3"></path>
     <path data-role="polar" fill="none" stroke="#2b8a3e" stroke-width="3"></path>
+    <path data-role="rms" fill="none" stroke="#845ef7" stroke-width="2" stroke-dasharray="6 6"></path>
   </svg>
   <div class="ml-legend">
     <span class="ml-chip"><span class="ml-dot" style="background:#adb5bd"></span>unit circle</span>
     <span class="ml-chip"><span class="ml-dot" style="background:#d9480f"></span>W · circle</span>
     <span class="ml-chip"><span class="ml-dot" style="background:#2b8a3e"></span>polar(W) · circle</span>
+    <span class="ml-chip"><span class="ml-dot" style="background:#845ef7"></span>RMS gain ring</span>
     <span class="ml-chip">s_max: <span class="ml-readout" data-role="sigma">0.00</span></span>
-    <span class="ml-chip">RMS?RMS: <span class="ml-readout" data-role="rms">0.00</span></span>
+    <span class="ml-chip">RMS gain: <span class="ml-readout" data-role="rms">0.00</span></span>
   </div>
 </div>
 
@@ -591,6 +602,7 @@ We visualize a 2×2 weight matrix acting on the unit circle. The spectral norm is
     var unitPath = root.querySelector("[data-role='unit']");
     var mappedPath = root.querySelector("[data-role='mapped']");
     var polarPath = root.querySelector("[data-role='polar']");
+    var rmsPath = root.querySelector("[data-role='rms']");
     var sigmaEl = root.querySelector("[data-role='sigma']");
     var rmsEl = root.querySelector("[data-role='rms']");
 
@@ -614,11 +626,9 @@ We visualize a 2×2 weight matrix acting on the unit circle. The spectral norm is
     var width = 640;
     var height = 360;
     var pad = 45;
-    var xMin = -3.5;
-    var xMax = 3.5;
-    var yMin = -2.6;
-    var yMax = 2.6;
-    var scale = makeScaler(width, height, pad, xMin, xMax, yMin, yMax);
+    var baseX = 3.5;
+    var baseY = 2.6;
+    var scale = makeScaler(width, height, pad, -baseX, baseX, -baseY, baseY);
 
     function circlePath(transform, colorScale) {
       var steps = 140;
@@ -656,6 +666,12 @@ We visualize a 2×2 weight matrix acting on the unit circle. The spectral norm is
       sigmaEl.textContent = sigma.toFixed(3);
       rmsEl.textContent = rms.toFixed(3);
 
+      var maxRadius = Math.max(baseX, sigma * 1.15, rms * 1.15);
+      var yRadius = Math.max(baseY, maxRadius * (baseY / baseX));
+      scale = makeScaler(width, height, pad, -maxRadius, maxRadius, -yRadius, yRadius);
+      drawGrid(grid, width, height, pad);
+      drawAxes(axes, width, height, pad, scale.sx, scale.sy);
+
       var A = [
         [a, b],
         [c, d]
@@ -672,10 +688,9 @@ We visualize a 2×2 weight matrix acting on the unit circle. The spectral norm is
       unitPath.setAttribute("d", circlePath(null, 1.0));
       mappedPath.setAttribute("d", circlePath(function (v) { return mulMatVec(A, v); }, 1.0));
       polarPath.setAttribute("d", circlePath(function (v) { return mulMatVec(polar, v); }, 1.0));
+      rmsPath.setAttribute("d", circlePath(null, rms));
     }
 
-    drawGrid(grid, width, height, pad);
-    drawAxes(axes, width, height, pad, scale.sx, scale.sy);
     render();
 
     Object.keys(inputs).forEach(function (key) {

@@ -143,9 +143,7 @@ Muon optimization is typically used for dense linear layers, where activations (
 
 With the **RMS (Root Mean Square) norm**:
 $\lVert v \rVert_{RMS} := \sqrt{\frac{1}{d} \sum_{i=1}^dv_i^2}$
-If all entries are $\pm 1$, then $\lVert v \rVert_{RMS} = 1$.
-$\lVert v \rVert_{RMS} = \frac{|v|_2}{\sqrt{d}}$.
-As inferred from above, dense neural network activations (post normalization) typically have $\lVert x \rVert_{RMS} \approx 1$.
+If all entries are $\pm 1$, then $\lVert v \rVert_{\mathrm{RMS}} = 1 \implies \lVert v \rVert_{\mathrm{RMS}} = \frac{\lVert v \rVert_2}{\sqrt{d}}$. As inferred from above, dense neural network activations (post normalization) typically have $\lVert v \rVert_{\mathrm{RMS}} \approx 1$.
 
 ### The Operator Norm
 
@@ -403,8 +401,7 @@ and, finally output: $O = X_K$.
 **Why this shapes singular values?**
 
 If $X_k = U\Sigma V^\top$, then:
-$$ A_k = X_k X_k^\top = U \Sigma^2 U^\top \
-A_k^2 = U\Sigma^4U^\top$$
+$$ A_k = X_k X_k^\top = U \Sigma^2 U^\top \implies A_k^2 = U\Sigma^4U^\top$$
 
 $$ \implies (bA_k + cA_k^2)X_k = U(b\Sigma^2 + c\Sigma^4)U^\top \cdot U\Sigma V^\top = U(b\Sigma^3 + c\Sigma^5)V^\top$$
 
@@ -442,8 +439,7 @@ For each step t:
    * Frobenius normalize $X_0 = \frac{B_t}{|B_t|_F + \epsilon}$
 
    * Iterate $K$ times:
-     $$ A_k = X_k X_k^\top \
-     X_{k+1} = aX_k + (bA_k + cA_k^2)X_k $$
+     $$ A_k = X_k X_k^\top \implies X_{k+1} = aX_k + (bA_k + cA_k^2)X_k $$
 
    * Orthogonalized matrix output $O_t = X_K$
 
