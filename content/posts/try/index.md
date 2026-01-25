@@ -1,5 +1,5 @@
 ---
-title: "The only Muon Optimizer guide you need"
+title: "Try"
 
 date: 2026-01-25
 draft: false
@@ -668,76 +668,88 @@ We can now complete our understanding of three fundamentally different optimizer
 - Diederik P. Kingma and Jimmy Ba. "Adam: A Method for Stochastic Optimization." arXiv:1412.6980 (2014). [https://doi.org/10.48550/arXiv.1412.6980](https://doi.org/10.48550/arXiv.1412.6980)
 - Herbert Robbins and Sutton Monro. "A Stochastic Approximation Method." The Annals of Mathematical Statistics 22(3):400-407 (1951). [https://doi.org/10.1214/aoms/1177729586](https://doi.org/10.1214/aoms/1177729586)
 
-
 <style>
+/* Smaller, tighter UI for the interactive blocks (no structural changes). */
 .ml-interactive {
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 10px;               /* smaller */
+  padding: 12px;                     /* smaller */
   background: var(--entry);
-  margin: 1rem 0 2rem;
+  margin: 0.75rem 0 1.25rem;         /* tighter */
 }
 
+/* Controls row: smaller gaps + typography */
 .ml-controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 18px;
+  gap: 8px 12px;                     /* tighter */
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;                /* tighter */
 }
 
 .ml-controls label {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
+  gap: 8px;                          /* tighter */
+  font-size: 0.85rem;                /* smaller */
+  line-height: 1.15;
 }
 
+/* Range sliders: shorter, slightly shorter height */
 .ml-controls input[type="range"] {
-  width: 180px;
+  width: 150px;                      /* smaller */
+  height: 16px;                      /* smaller */
 }
 
+/* Numeric readout: smaller */
 .ml-readout {
   font-variant-numeric: tabular-nums;
   color: var(--secondary);
+  font-size: 0.85rem;                /* smaller */
 }
 
+/* Plot container: slightly tighter corners */
 .ml-plot {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 8px;
+  border-radius: 6px;                /* smaller */
   border: 1px solid var(--border);
 }
 
+/* Legend row: smaller typography + gaps */
 .ml-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 8px;
-  font-size: 0.9rem;
+  gap: 8px 10px;                     /* tighter */
+  margin-top: 6px;                   /* tighter */
+  font-size: 0.82rem;                /* smaller */
   color: var(--secondary);
 }
 
+/* Legend chip + dot smaller */
 .ml-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;                          /* tighter */
 }
 
 .ml-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;                        /* smaller */
+  height: 8px;                       /* smaller */
   border-radius: 999px;
   display: inline-block;
 }
 
+/* Buttons: smaller padding, font, radius */
 .ml-button {
-  padding: 6px 10px;
+  padding: 4px 8px;                  /* smaller */
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 7px;                /* smaller */
   background: var(--code-bg);
   color: var(--primary);
+  font-size: 0.85rem;                /* smaller */
+  line-height: 1.1;
 }
 
 .ml-button:hover {
