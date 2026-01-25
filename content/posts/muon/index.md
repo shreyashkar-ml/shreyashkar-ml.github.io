@@ -121,8 +121,7 @@ However, diagonals are scaled independently with no cross-coordinate coupling an
 
 If we consider a linear layer with weight matrix $W \in \mathbb{R}^{m \times n}$.
 
-For the transformation
-(y = Wx)
+For the transformation $y = Wx$.
 
 Under, Adam's coordinate-wise scaling, $W_{ij}$ and $W_{kl}$ are treated as independent.
 
