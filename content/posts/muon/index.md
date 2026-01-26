@@ -1,7 +1,7 @@
 ---
 title: "The only Muon Optimizer guide you need"
 
-date: 2026-01-25
+date: 2026-01-26
 draft: false
 math: true
 toc: true
@@ -10,13 +10,13 @@ toc: true
 All neural networks uses a form of gradient descent for updating their parameters. The fundamental intuition to all neural net's parameter optimization seems obvious to us, i.e., to move opposite to the gradient. However, there are important caveats to the obvious intuition of following direction opposite to the gradient for optimization. For instance, what curvature to follow along the steepest descent? the scale to which we should move at each step? and the stability of each movement over an unoptimized loss landscape.
 
 To allow for a controlled gradient descent that tackles around these caveats, most optimizers follow a template of **constrained linearized improvement** such that, we solve:
-$$ \min_{\Delta\theta} \langle g, \Delta\theta \rangle \quad \text{subject to} \quad |\Delta\theta| \leq \eta $$
+$$ \min_{\Delta\theta} \langle g, \Delta\theta \rangle \quad \text{subject to} \quad \lVert \Delta\theta \rVert \leq \eta $$
 
 where,
 
 * $\theta \rightarrow$ current parameters
 * $g = \nabla_\theta \mathcal{L} \rightarrow$ gradient
-* $|\cdot| \rightarrow$ a notion of step size via some norm
+* $\lVert \cdot \rVert \rightarrow$ a notion of step size via some norm
 
 which implies to find a direction that decreases the linearized loss the most, given that we're not stepping "too far" according to the bounds of our chosen constrain.
 
@@ -24,23 +24,37 @@ Before we dive deep into Muon's architecture, it serves us well to look at one o
 
 ## Stochastic Gradient Descent (SGD) as simplified steepest descent under Euclidean metrics.
 
-SGD is a simplified technique for steepest gradient descent where we use a standard Euclidean (L2) norm for constrained optimization, i.e., $|\Delta\theta|_2 = \sqrt{\sum_i \Delta\theta_i^2}$.
+SGD is a simplified technique for steepest gradient descent where we use a standard Euclidean (L2) norm for constrained optimization, i.e., $\lVert \Delta\theta \rVert_2 = \sqrt{\sum_i \Delta\theta_i^2}$.
 
 ### Solving the constrained problem
 
 We want:
-$\min_{\Delta\theta} \langle g, \Delta\theta \rangle \quad \text{subject to} \quad \lVert\Delta\theta \rVert_2 \leq \eta$
+$$ \min_{\Delta\theta} \langle g, \Delta\theta \rangle \quad \text{subject to} \quad \lVert\Delta\theta \rVert_2 \leq \eta$$
+
+Because the objective is linear in $\Delta \theta$, the optimum occurs on the boundary $\lVert \Delta \theta \rVert_2 = \eta$. So we equivalently solve
+$$\min_{\Delta\theta} \langle g, \Delta\theta \rangle \quad \text{subject to} \quad \lVert\Delta\theta \rVert_2 = \eta^2$$
 
 The geometrically obvious solution to this is *to move in the opposite direction to the gradient*.
 
-$\Delta\theta^* = -\eta \frac{g}{|g|_2}$
+From the Lagrangian:
+$$\mathcal{J} (\Delta \theta, \lambda) = \langle, \Delta \theta \rangle + \lambda ( \lVert \Delta \theta \rVert_2^2 - \eta^2) $$
 
-With a given learning rate of $\alpha$, this becomes:
+Stationary w.r.t $\Delta \theta$:
+$$ \nabla_{\Delta \theta} \mathcal{J} = g + 2 \lambda \Delta \theta = 0 \quad \implies \Delta \theta = - \frac{1}{2 \lambda}g $$
 
-$\theta_{t+1} = \theta_t - \alpha g_t$
+Solving this for $ \lVert \Delta \theta \rVert_2 = \eta $ gives $\Delta\theta^* = -\eta \frac{g}{\lVert g \rVert_2}$
 
-<div style="margin-left: 2em; font-size: 0.85em;"><em>
-Let's take a look at a 2D quadratic loss (elliptical contours) tracing a SGD path. The blue polyline is the sequence of SGD steps from the start (green) to orange (end). Increasing the learning rate here leads to faster progress (and potential overshoot), raising the step count lengthens the trajectory, and moving the start point samples different regions of the curvature.</em></div>
+However, the commonly used SGD update is:
+$$ \Delta \theta_{SGD} = - \alpha g_t \implies \theta_{t+1} = \theta_t - \alpha g_t$$
+
+where $\alpha$ is the learning rate and $g_t$ is a **stochastic mini-batch gradient**:
+$$ g_t = \Delta_{\theta}l(\theta_t; B_t), \quad \mathbb{E}[g_t] = \Delta_{\theta} \mathcal{L}(\theta_t) $$
+
+<small>
+
+*Let's take a look at plain SGD on a simple quadratic loss $ L(x,y) = \frac{1}{2}(ax^2 + by^2)$. The elliptical contours visualize unequal curvature across directions. With a single learning rate $\alpha$, SGD follows the negative gradient $(x, y) \leftarrow (x,y) - \alpha \Delta L$, which causes zig-zagging and slow progress when one direction is much steeper than the other.*
+
+</small>
 
 <div class="ml-interactive" data-ml="sgd-basic">
   <div class="ml-controls">
@@ -92,26 +106,30 @@ With these limitations around the usage of a global learning step and difficulti
 
 ## Adam
 
-One of the most commonly used optimizers today, Adam, tries to mitigate this via applying a diagonal, coordinate-wise scaling of updates in parameter space, tuning the effective step size on a per-parameter bases and reducing sensitivity to gradient scale differences. Adam maintains running estimates of the first moment and second raw moment of gradients, which helps normalize gradient scales across coordinates and stabilize updates in uneven gradient regimes, making it more robust to gradient scale changes.
+One of the most commonly used optimizers today, Adam, tries to mitigate this via applying a diagonal, coordinate-wise scaling of updates in parameter space, tuning the effective step size on a per-parameter bases and reducing sensitivity to gradient scale differences. Adam also maintains running estimates of the first moment and second raw moment of gradients, which helps normalize gradient scales across coordinates and stabilize updates in uneven gradient regimes, making it more robust to gradient scale changes.
 
 To expand on the problem, consider a deep network with varying gradient scales s.t. $g_1 \approx 10^{-6}$ and $g_2 \approx 10^2$, a single learning rate $\alpha$ is painful to tune here since:
 
 * Too large $\implies \theta_2$ explodes
 * Too small $\implies \theta_1$ barely moves
 
-<div style="margin-left: 2em; font-size: 0.85em;"><em>Let's take a look at a loss landscape with very different curvature along each axis (steep in one direction, flat in the other). The same global learning rate principle from SGD produces zig-zagging updates here, while a simple per-coordinate rescaling stabilizes the path. The curvature ratio controls how anisotropic the loss landscape is (higher means one direction is much steeper), we can compare both plain SGD and coordinate-scaled learning here.</em></div>
+<small>
+
+*Now, we illustrate how diagonal scaling changes optimization geometry. The orange path is plain SGD with a single $\alpha$. The green path applies per-coordinate rescaling $\Delta x = -\alpha \frac{1}{a}\frac{\delta L}{\delta x}, \Delta y = - \alpha \frac{1}{b}\frac{\delta  L}{\delta y}$, which exactly compensates for curvature in this toy probelm.*
+
+</small>
 
 <div class="ml-interactive" data-ml="sgd-scaling">
   <div class="ml-controls">
     <label>
-      Curvature ratio (a:b)
+      Curvature ratio (a/b)
       <input type="range" min="1" max="60" value="25" step="1" data-role="ratio" />
       <span class="ml-readout" data-role="ratio-val">25</span>
     </label>
     <label>
       Learning rate
       <input type="range" min="0.005" max="0.1" value="0.03" step="0.005" data-role="lr" />
-      <span class="ml-readout" data-role="lr-val">0.12</span>
+      <span class="ml-readout" data-role="lr-val">0.03</span>
     </label>
     <label>
       Steps
@@ -129,7 +147,7 @@ To expand on the problem, consider a deep network with varying gradient scales s
   </svg>
   <div class="ml-legend">
     <span class="ml-chip"><span class="ml-dot" style="background:#d9480f"></span>SGD (single lr)</span>
-    <span class="ml-chip"><span class="ml-dot" style="background:#2b8a3e"></span>coordinate-scaled</span>
+    <span class="ml-chip"><span class="ml-dot" style="background:#2b8a3e"></span>Diagonal-scaled</span>
   </div>
 </div>
 
@@ -137,31 +155,33 @@ Now, we define "distance" **coordinate-wise** using a diagonal scaling.
 
 Let $d_i > 0$ be per-coordinate scale factors, and define
 
-$|\Delta\theta|_{d}^2 := \sum_i d_i,\Delta\theta_i^2.$
+$|\Delta\theta|_{d}^2 := \sum_i d_i \Delta\theta_i^2$
 
-This is a valid norm (equivalently $|\Delta\theta|_d^2 = \Delta\theta^\top D,\Delta\theta$ with $D=\mathrm{diag}(d)$). The steepest descent solution under this metric will divide the gradient by $d_i$.
+This is a valid norm (equivalently $|\Delta\theta|_d^2 = \Delta\theta^\top D\Delta\theta$ with $D=\mathrm{diag}(d)$). The steepest descent solution under this metric will divide the gradient by $d_i$.
 
 Now, again solving the constrained linearized improvement with this diagonal norm, we get
 
-$\min_{\Delta\theta} \langle g, \Delta\theta \rangle \quad \text{subject to} \quad \sum_i d_i,\Delta\theta_i^2 \leq \eta^2$
+$\min_{\Delta\theta} \langle g, \Delta\theta \rangle \quad \text{subject to} \quad \sum_i d_i \Delta\theta_i^2 \leq \eta^2$
 
 Applying the Lagrangian multiplier, we get
 
-$\mathcal{J}(\Delta\theta, \lambda) = \sum_i g_i \Delta\theta_i + \lambda \left( \sum_i d_i,\Delta\theta_i^2 - \eta^2 \right)$
+$\mathcal{J}(\Delta\theta, \lambda) = \sum_i g_i \Delta\theta_i + \lambda \left( \sum_i d_i \Delta\theta_i^2 - \eta^2 \right)$
 
 and the stationary condition turns out to be
 
-$\frac{\partial \mathcal{J}}{\partial \Delta\theta_i} = g_i + 2\lambda, d_i,\Delta\theta_i = 0$
+$\frac{\partial \mathcal{J}}{\partial \Delta\theta_i} = g_i + 2\lambda d_i \Delta\theta_i = 0$
 
 Solving for $\Delta\theta_i$ we get
 
-$\Delta\theta_i = -\frac{1}{2\lambda},\frac{g_i}{d_i}$
+$\Delta\theta_i = -\frac{1}{2\lambda} \frac{g_i}{d_i}$
 
 The update direction is
 
 $\Delta\theta \propto -\mathrm{diag}(d)^{-1} g$
 
 In Adam, $d_i$ is taken to be roughly $\sqrt{\hat{s}_{t,i}} + \epsilon$ (a smoothed estimate of the RMS gradient at coordinate $i$), which yields the classic division by $\sqrt{\hat{s}_t}+\epsilon$.
+
+Ignoring momentun, the adaptive diagonal scaling corresponds to steepest descent in a diagonal metric, Adam adds momentum on top for stability in parameter update.
 
 ### Adam algorithm
 
@@ -172,7 +192,7 @@ The complete Adam algorithm is
 **First moment (momentum):**
 $v_t = \beta_1 v_{t-1} + (1 - \beta_1) g_t$
 
-**Second moment (gradient variance):**
+**Second raw moment:**
 $s_t = \beta_2 s_{t-1} + (1 - \beta_2) g_t^2 \quad \text{(elementwise)}$
 
 **Bias correction:**
@@ -226,7 +246,7 @@ If all entries are $\pm 1$, then $\lVert v \rVert_{\mathrm{RMS}} = 1 \implies \l
 
 For a matrix $M$ acting on a vector $x$: $y = Mx$
 
-The condition number $\kappa(M) = \sigma_{\max}(M) / \sigma_{\min}(M)$ captures the relative difficulty of optimization by quantifying how differently the loss responds to parameter updates along its steepest and flattest directions.
+The condition number $\kappa(M) = \sigma_{\max}(M) / \sigma_{\min}(M)$ captures the **anisotropy** of the linear map $M$, it quantifies how differently $M$ stretches vectors along its most-amplifying vs least-amplifying singular directions.
 
 To measure "how much a matrix can stretch vectors", we use an **operator norm**:
 $\lVert M \rVert_{op} := \max_{ x \neq 0} \frac{\lVert Mx \rVert}{\lVert x \rVert}$
@@ -249,9 +269,9 @@ $$\lVert M \rVert_{RMS \to RMS} = \max_{x \neq 0} \frac{\lVert Mx \rVert_2 / \sq
 
 Or in terms of $\text{fan-in} \ (n)$ and $\text{fan-out} \ (m)$:
 
-$$\lVert M \rVert_{RMS \to RMS} = \sqrt{\frac{\text{fan-in}}{\text{fan-out}}} \cdot \lVert M \rVert_*$$
+$$\lVert M \rVert_{RMS \to RMS} = \sqrt{\frac{\text{fan-in}}{\text{fan-out}}} \cdot \lVert M \rVert_2$$
 
-where $\lVert M \rVert_* = \sigma_{\max}(M)$ is the spectral norm.
+where $\lVert M \rVert_2 = \sigma_{\max}(M)$ is the spectral norm.
 
 ### Formulating Muon's constrained Optimization
 
@@ -269,7 +289,7 @@ Thus, the RMS-to-RMS operator norm of $\Delta W$ directly bounds how much the la
 
 Applying the template of **constrained linearized improvement**, we get 
 
-$$\min_{\Delta W} \langle \nabla_W \mathcal{L}, \Delta W \rangle \quad \text{subject to} \quad |\Delta W|_{\text{RMS}\to\text{RMS}} \leq \eta \tag{✧}$$
+$$\min_{\Delta W} \langle \nabla_W \mathcal{L}, \Delta W \rangle \quad \text{subject to} \quad \lVert \Delta W \rVert_{\text{RMS}\to\text{RMS}} \leq \eta \tag{✧}$$
 
 Instead of constraint over parameter update, we find the weight update $\Delta W$ that maximizes descent along the gradient, subject to bounding how much the layer's output can change.
 
@@ -281,17 +301,21 @@ Consider the SVD of $ \Delta W$:
 $$ \Delta W = U \Sigma V^\top = \sum_{i=1}^r \sigma_i u_i v_i^\top $$
 where $\sigma_1 \geq \sigma_2 \geq \cdots \geq \sigma_r > 0$ are singular values, $u_i$ are left singular vectors, and $v_i$ are right singular vectors.
 
-The spectral norm for such $\Delta W$ is $\lVert \Delta W \rVert_* = \sigma_1$, the largest singular value.
+The spectral norm for such $\Delta W$ is $\lVert \Delta W \rVert_2 = \sigma_1$, the largest singular value.
 
-Matrices with $\lVert \Delta W \rVert_* \leq \eta$ are exactly those where *no singular value exceeds $\eta$*.
+Matrices with $\lVert \Delta W \rVert_2 \leq \eta$ are exactly those where *no singular value exceeds $\eta$*.
 
 If we consider matrices where *all* singular values equal some constant $c$:
 $$ \sigma_1 = \sigma_2 = \cdots = \sigma_r = c \quad (\text{when} \\ r=\min(m,n)) $$
 
-Such matrices have the form $\Delta W = c \cdot Q$ where $Q = UV^\top$ satisfies
+Such matrices have the form $\Delta W = c \cdot Q$ where $Q = UV^\top$ satisfies one of:
+- if $m \ge n$ (tall): $Q^\top Q = I_n$ (orthonormal columns)
+- if $ m \le n$ (wide): $QQ^\top = I$ (orthonormal rows)
+
+As an example for orthonormal columns:
 $$Q^\top Q = VU^\top UV^\top = VV^\top = I$$
 
-A matrix $Q$ with $Q^\top Q = I$ is called **semi-orthogonal** (or **orthogonal** if square matrix).
+A matrix $Q$ with $Q^\top Q = I$ if $m \ge n$, else with $QQ^\top = I$ is called **semi-orthogonal** (or **orthogonal** if square matrix).
 
 Now, given any matrix $M$, what's the "closest" semi-orthogonal matrix?
 Formally, we solve $\min_{Q:Q^\top Q=I} |M - Q|_F$
@@ -316,10 +340,11 @@ where:
 
 An intuition to orthogonalization is *discarding the stretch, retaining the rotation*.
 
-<div style="margin-left: 2em; font-size: 0.85em;"><em>Let's visualize a $ 2 \times 2$ weight matrix acting on the unit circle. The spectral norm is the maximum stretch. The polar factor removes stretching while preserving rotation, echoing Muon's orthogonalized update.
+<small>
 
-The sliders labeled a, b, c, d are the entries of the weight matrix
-`W = [[a, b], [c, d]]`. The orange curve shows how W stretches the unit circle; the green curve shows the closest orthogonal (polar) factor that preserves rotation but removes stretching. The dashed ring is an RMS gain guide that scales with fan-in/out via `sigma_max * sqrt(n/m)`; as we change n and m, the ring (and scale) adjusts even if the matrix entries stay fixed.</em></div>
+*Let's visualize how a weight matrix $W$ acts a linear operator. Applying $W$ to the unit circle (orange) stretches it into an ellipse whose largest radius is the spectral norm $\sigma_{max}(W)$. The polar factor **polar($W$)** (green) removes this stretching while preserving the singular directions, mapping the circle back to a circle. The dashed ring shows $RMS \to RMS$ gain $\sqrt{\frac{n}{m}}\sigma_{max}(W)$, which is the quantity Muon directly constrains.*
+
+</small>
 
 <div class="ml-interactive" data-ml="operator-norm">
   <div class="ml-controls">
@@ -368,8 +393,7 @@ The sliders labeled a, b, c, d are the entries of the weight matrix
     <span class="ml-chip"><span class="ml-dot" style="background:#d9480f"></span>W circle</span>
     <span class="ml-chip"><span class="ml-dot" style="background:#2b8a3e"></span>polar(W) circle</span>
     <span class="ml-chip"><span class="ml-dot" style="background:#845ef7"></span>RMS gain ring</span>
-    <span class="ml-chip">s_max: <span class="ml-readout" data-role="sigma">0.00</span></span>
-    <span class="ml-chip">RMS gain: <span class="ml-readout" data-role="rms">0.00</span></span>
+    <span class="ml-chip">σ_max: <span class="ml-readout" data-role="sigma">0.00</span></span>
   </div>
 </div>
 
@@ -395,21 +419,25 @@ With our operator norm constraint of $\lVert \Delta W \rVert_{RMS \rightarrow RM
 
 **Finding the optimal direction.**
 
-If we want to maximize $\langle -g, v \rangle$ subject to $|v| = 1$, the answer is $v = -g / |g|$. We normalize $g$ to get a unit vector pointing in the same direction.
+If we want to maximize $\langle -g, v \rangle$ subject to $\lVert v \rVert = 1$, the answer is $v = -g / \lVert g \rVert $. We normalize $g$ to get a unit vector pointing in the same direction.
 
-For matrices, we want the same thing: find the matrix $Q$ with $|Q|_{\text{op}} = 1$ that maximizes $\langle -G, Q \rangle$. The matrix analogue of "normalize to unit length" is to project onto the unit operator-norm boundary. This replaces $G$ by its polar factor $U_G V_G^\top$, which preserves the singular directions of $G$ while discarding their relative magnitudes.
+For matrices, we want the same thing: find the matrix $Q$ with $\lVert Q \rVert_{\text{op}} \le 1$ that maximizes $\langle -G, Q \rangle$. The matrix analogue of "normalize to unit length" is to project onto the unit operator-norm boundary. This replaces $G$ by its polar factor $U_G V_G^\top$, which preserves the singular directions of $G$ while discarding their relative magnitudes.
 
 Why does this work? If we express $G$ as $U_G \Sigma_G V_G^\top$ (SVD), then:
 
 $$\langle G, U_G V_G^\top \rangle = \text{tr}(G^\top U_G V_G^\top) = \text{tr}(V_G \Sigma_G U_G^\top U_G V_G^\top) = \text{tr}(\Sigma_G) = \sum_i \sigma_i$$
 
-This is the sum of all singular values, i.e., the maximum possible inner product with any matrix of spectral norm 1. So $-U_G V_G^\top$ is the unit-norm matrix most aligned with $-G$, just as $-g/|g|$ is the unit vector most aligned with $-g$.
+This is the sum of all singular values, i.e., the maximum possible inner product with any matrix of **operator (spectral) norm** $\le$ 1; this maximum equals the **nuclear norm** $\lVert G \rVert_*$. 
+
+So $-U_G V_G^\top$ is the unit-norm matrix most aligned with $-G$, just as $-g/\lVert g \rVert$ is the unit vector most aligned with $-g$.
 
 **Scaling to saturate the constraint.**
 
-Now, we want $\Delta W = -c \cdot U_G V_G^\top$ for some $c > 0$. Since $U_G V_G^\top$ has spectral norm = 1:
+$$ \lVert W \rVert_{RMS \to RMS} = \sqrt{\frac{n}{m}}\lVert W \rVert_{op} $$
 
-$\lVert \Delta W \rVert_{\text{RMS} \to \text{RMS}} = \sqrt{\frac{n}{m}} \cdot |{-c \cdot U_G V_G^\top}|*{\text{op}} = c \sqrt{\frac{n}{m}}$
+Now, we want $\Delta W = -c \cdot U_G V_G^\top$ for some $c > 0$, where $\lVert U_G V_G^\top \rVert_{op} = 1$ (since $U_G V_G^\top$ has spectral norm = 1):
+
+$\implies \lVert \Delta W \rVert_{\text{RMS} \to \text{RMS}} = \sqrt{\frac{n}{m}} \cdot \lVert {-c \cdot U_G V_G^\top} \rVert_{\text{op}} = c \sqrt{\frac{n}{m}}$
 
 Setting this equal to $\eta$:
 
@@ -426,15 +454,15 @@ $ \implies$ Muon's optimal update is the **orthogonalized gradient**, i.e, the p
 **What do we orthogonalize?**
 
 So far, we solved a *per-step* constrained problem and got a closed-form step:
-$\Delta W^* \propto -,U_G V_G^\top.$
+$\Delta W^* \propto -U_G V_G^\top.$
 
 > In SGD/Adam, we step using some processed version of the mini-batch gradient. In Muon, what matrix should we feed into the "orthogonalizer" to get $UV^\top$?
 
 The most naive choice would be $ \Delta W_t \propto \text{-polar}(G_t)$ where $G_t = \nabla_W \mathcal{L}(W_t)$.
 
-However, **mini-batch gradient matrices are typically low rank**. If we force a low-rank matrix to be orthogonal (full rank) via a full SVD/polar computation, we're effectively *inventing directions* in the null space where the gradient was actually zero. Thus, **amplifying noise!**
+However, **mini-batch gradient matrices are typically low rank**. If we polar-orthogonalize such a matrix, we equalize its nonzero singular values towards 1, which can upweight weak/noisy singular directions relative to the dominant signal directions leading to amplification of sampling noise.
 
-Hence, Muon introduces a *momentum buffer* first, it accumulates gradients acorss steps so the matrix we orthogonalize becomes representative (and closer to full rank).
+Hence, Muon introduces a *momentum buffer* first, it accumulates gradients acorss steps so the matrix we orthogonalize has a smoother, more stable singular spectrum (and often higher effective rank).
 
 **Momentum Buffer** $B_t$:
 $ B_t = \mu B_{t-1} + G_t$
@@ -476,7 +504,7 @@ Iterating for t=1,2,...
    * **AdamW RMS-matching** (Moonshot / “match_rms_adamw” style): target an update RMS similar to AdamW (often around 0.2–0.4), implemented via a shape-dependent multiplier (e.g., proportional to $\sqrt{\max(m,n)}$) or by explicitly normalizing the update RMS.
 
 4. Update with decoupled weight decay:
-   $W_{t+1} = W_t - \gamma, O_t - \gamma,\lambda, W_t$
+   $W_{t+1} = W_t - \gamma (O_t + \lambda W_t$)
 
 ### Newton-Schulz as an approximation to SVD
 
@@ -600,14 +628,14 @@ For each step t:
 
    A common modern choice (Moonshot-style) is to match AdamW-like update RMS by scaling the orthogonalized update by
 
-   $$ O_t \leftarrow 0.2, O_t,\sqrt{\max(m,n)} $$
+   $$ O_t \leftarrow O_t \cdot 0.2\sqrt{\max(m,n)} $$
 
    (equivalently: keep $O_t$ fixed and scale the effective learning rate by $0.2\sqrt{\max(m,n)}$).
 
    Other implementations use a different shape-based adjustment rule, but the core goal is the same: keep update RMS consistent across matrix shapes.
 
 4. **Update with decoupled weight decay**:
-   $$ W_{t+1} = W_t - \gamma,(O_t + \lambda W_t) $$
+   $$ W_{t+1} = W_t - \gamma(O_t + \lambda W_t) $$
 
 Now we recall from  $(✧)$ that in a pure constrained-optimization derivation, the optimal solution includes
 $$\Delta W^* = -\eta \sqrt{\frac{\text{fan-out}}{\text{fan-in}}} UV^\top$$
@@ -618,6 +646,17 @@ In code, this “shape scaling” is typically implemented either:
 * Implicitly via the learning-rate adjustment / update-RMS calibration.
 
 Different implementations expose this as an `adjust_lr_fn` / scaling mode knob (e.g., “original” vs “match_rms_adamw”).
+
+Muon's update is optimal under a very specific assumption, the parameter being optimized defines a **dense linear layer whose primary effect is directional**, not scalar.
+
+Muon assumes that a parameter $W$ is used in a map
+$$ y = Mx \quad \lVert x \rVert_{RMS} \approx 1 $$
+
+Under these conditions, bounding the operator norm of $\Delta W$ directly bounds how much the layer's behavior can change, and orthogonalizing the update removes spurious directional imbalance.
+
+Muon breaks down whenever this assumption fails. If a parameter does not define a global linear map (e.g. indexed or sparse updates), does not operate on directions (e.g. scaling shift in bias), or encodes scale as signal (e.g. normalization parameters), enforcing an oeprator-norm geometry imposes artificial structure and can amplify noise or suppress meaningful magnitude information.
+
+Therefore, Muon fits best with `normalized activations + matrix params`, and is practically not intended with *biases, embeddings, LayerNorm params, conv kernels, etc.*
 
 ## Practical caveat at scale: MuonClip / QK-Clip (Moonshot)
 
@@ -670,74 +709,87 @@ We can now complete our understanding of three fundamentally different optimizer
 
 
 <style>
+/* Smaller, tighter UI for the interactive blocks (no structural changes). */
 .ml-interactive {
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 10px;               /* smaller */
+  padding: 12px;                     /* smaller */
   background: var(--entry);
-  margin: 1rem 0 2rem;
+  margin: 0.75rem 0 1.25rem;         /* tighter */
 }
 
+/* Controls row: smaller gaps + typography */
 .ml-controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 18px;
+  gap: 8px 12px;                     /* tighter */
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;                /* tighter */
 }
 
 .ml-controls label {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
+  gap: 8px;                          /* tighter */
+  font-size: 0.85rem;                /* smaller */
+  line-height: 1.15;
 }
 
+/* Range sliders: shorter, slightly shorter height */
 .ml-controls input[type="range"] {
-  width: 180px;
+  width: 150px;                      /* smaller */
+  height: 16px;                      /* smaller */
 }
 
+/* Numeric readout: smaller */
 .ml-readout {
   font-variant-numeric: tabular-nums;
   color: var(--secondary);
+  font-size: 0.85rem;                /* smaller */
 }
 
+/* Plot container: slightly tighter corners */
 .ml-plot {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 8px;
+  border-radius: 6px;                /* smaller */
   border: 1px solid var(--border);
 }
 
+/* Legend row: smaller typography + gaps */
 .ml-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 8px;
-  font-size: 0.9rem;
+  gap: 8px 10px;                     /* tighter */
+  margin-top: 6px;                   /* tighter */
+  font-size: 0.82rem;                /* smaller */
   color: var(--secondary);
 }
 
+/* Legend chip + dot smaller */
 .ml-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;                          /* tighter */
 }
 
 .ml-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;                        /* smaller */
+  height: 8px;                       /* smaller */
   border-radius: 999px;
   display: inline-block;
 }
 
+/* Buttons: smaller padding, font, radius */
 .ml-button {
-  padding: 6px 10px;
+  padding: 4px 8px;                  /* smaller */
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 7px;                /* smaller */
   background: var(--code-bg);
   color: var(--primary);
+  font-size: 0.85rem;                /* smaller */
+  line-height: 1.1;
 }
 
 .ml-button:hover {
