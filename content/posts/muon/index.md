@@ -7,7 +7,7 @@ math: true
 toc: true
 ---
 
-All neural networks uses a form of gradient descent for updating their parameters. The fundamental intuition to all neural net's parameter optimization seems obvious to us, i.e., to move opposite to the gradient. However, there are important caveats to the obvious intuition of following direction opposite to the gradient for optimization. For instance, what curvature to follow along the steepest descent? the scale to which we should move at each step? and the stability of each movement over an unoptimized loss landscape.
+All neural networks use a form of gradient descent for updating their parameters. The fundamental intuition to all neural net's parameter optimization seems obvious to us, i.e., to move opposite to the gradient. However, there are important caveats to the obvious intuition of following direction opposite to the gradient for optimization. For instance, what curvature to follow along the steepest descent? the scale to which we should move at each step? and the stability of each movement over an unoptimized loss landscape.
 
 To allow for a controlled gradient descent that tackles around these caveats, most optimizers follow a template of **constrained linearized improvement** such that, we solve:
 $$ \min_{\Delta\theta} \langle g, \Delta\theta \rangle \quad \text{subject to} \quad \lVert \Delta\theta \rVert \leq \eta $$
@@ -234,7 +234,7 @@ where $\Delta y = \Delta W \cdot x$.
 
 Under the geometrical intuition of Muon, we don't directly care how much $W$ changed entry-by-entry. We care how much $\Delta y$ can be for typical inputs x, i.e., how much the layer's behavior changed.
 
-Thus, the constrain in Muon for $\Delta W$ should rather be, "how much can it change outputs?" instead of "how big are the changes in its individual entries".
+Thus, the constraint in Muon for $\Delta W$ should rather be, "how much can it change outputs?" instead of "how big are the changes in its individual entries".
 
 Muon optimization is typically used for dense linear layers, where activations (after normalization layers) tend to have entries of order 1, i.e., not too big, not too small.
 
