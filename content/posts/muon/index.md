@@ -37,7 +37,7 @@ $$\min_{\Delta\theta} \langle g, \Delta\theta \rangle \quad \text{subject to} \q
 The geometrically obvious solution to this is *to move in the opposite direction to the gradient*.
 
 From the Lagrangian:
-$$\mathcal{J} (\Delta \theta, \lambda) = \langle, \Delta \theta \rangle + \lambda ( \lVert \Delta \theta \rVert_2^2 - \eta^2) $$
+$$\mathcal{J} (\Delta \theta, \lambda) = \langle g, \Delta \theta \rangle + \lambda ( \lVert \Delta \theta \rVert_2^2 - \eta^2) $$
 
 Stationary w.r.t $\Delta \theta$:
 $$ \nabla_{\Delta \theta} \mathcal{J} = g + 2 \lambda \Delta \theta = 0 \quad \implies \Delta \theta = - \frac{1}{2 \lambda}g $$
