@@ -105,7 +105,7 @@ $$
 R(m)q = R(m) \cdot (W_q \cdot x_m)
 $$
 $$
-R(n)k  = R(m) \cdot (W_k \cdot x_n)
+R(n)k  = R(n) \cdot (W_k \cdot x_n)
 $$
 
 the attention mechanism computes,
