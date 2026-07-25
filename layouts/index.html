@@ -1,10 +1,37 @@
 {{- define "main" }}
 <section class="reference-page">
-  <section class="home-intro" aria-labelledby="home-title">
-    <img class="home-avatar" src="https://github.com/shreyashkar-ml.png?size=160" alt="Shreyashkar Lal Sahu" width="84" height="84">
-    <div class="home-intro-copy">
-      <h1 id="home-title" class="display-name"><span id="typewriter-text"></span><span class="typewriter-cursor" aria-hidden="true"></span></h1>
-      <p class="intro-copy">AI engineer and LLM research enthusiast. I work across deep learning, high-performance data engineering, and language model systems.</p>
+  <section class="home-terminal" data-home-terminal aria-label="Interactive terminal">
+    <div class="home-terminal-bar">
+      <div class="home-terminal-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+      <span>shreyashkar@portfolio:~</span>
+      <span>/bin/sh</span>
+    </div>
+    <div class="home-terminal-body" data-terminal-body>
+      <div class="home-terminal-hero">
+        <img class="home-terminal-image" src="{{ "/images/monkey.jpeg" | relURL }}" alt="Monkey wearing a suit and using a laptop">
+        <pre class="home-terminal-banner" aria-label="Hi, I am Shreyashkar">
+██   ██ ██        ██      █████  ███    ███
+██   ██ ██        ██     ██   ██ ████  ████
+███████ ██        ██     ███████ ██ ████ ██
+██   ██ ██        ██     ██   ██ ██  ██  ██
+██   ██ ██ ▄█     ██     ██   ██ ██      ██
+
+███████ ██   ██ ██████  ███████ ██    ██  █████  ███████ ██   ██ ██   ██  █████  ██████
+██      ██   ██ ██   ██ ██       ██  ██  ██   ██ ██      ██   ██ ██  ██  ██   ██ ██   ██
+███████ ███████ ██████  █████     ████   ███████ ███████ ███████ █████   ███████ ██████
+     ██ ██   ██ ██   ██ ██         ██    ██   ██      ██ ██   ██ ██  ██  ██   ██ ██   ██
+███████ ██   ██ ██   ██ ███████    ██    ██   ██ ███████ ██   ██ ██   ██ ██   ██ ██   ██</pre>
+      </div>
+      <div class="home-terminal-session" data-terminal-session>
+        <div class="home-terminal-output" data-terminal-output>
+          <p><span class="terminal-status">●</span> session ready. type <button type="button" data-terminal-command="help">help</button> for commands.</p>
+        </div>
+        <form class="home-terminal-prompt" data-terminal-form>
+          <label for="home-terminal-input"><span>shreyashkar@portfolio</span>:~$</label>
+          <input id="home-terminal-input" data-terminal-input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal command">
+          <span class="terminal-cursor" aria-hidden="true"></span>
+        </form>
+      </div>
     </div>
   </section>
 
@@ -69,20 +96,103 @@
 </section>
 <script>
   (() => {
-    const text = "hey, i'm shreyashkar lal sahu";
-    const target = document.getElementById("typewriter-text");
-    if (target) {
-      [...text].forEach((character, index) => {
-        window.setTimeout(() => { target.textContent += character; }, index * 55);
-      });
-    }
-
     document.querySelectorAll(".reference-project-title").forEach((project) => {
       project.addEventListener("pointermove", (event) => {
         const bounds = project.getBoundingClientRect();
         project.style.setProperty("--pointer-x", `${event.clientX - bounds.left}px`);
       });
     });
+
+    const terminal = document.querySelector("[data-home-terminal]");
+    if (terminal) {
+      const form = terminal.querySelector("[data-terminal-form]");
+      const input = terminal.querySelector("[data-terminal-input]");
+      const output = terminal.querySelector("[data-terminal-output]");
+      const session = terminal.querySelector("[data-terminal-session]");
+      const commands = {
+        about: "AI engineer and LLM research enthusiast. I work across deep learning, high-performance data engineering, and language model systems.",
+        projects: { text: "opening selected projects...", href: "#projects-title" },
+        blogs: { text: "opening recent writing...", href: "{{ "/posts/" | relURL }}" },
+        github: { text: "opening github.com/shreyashkar-ml...", href: "https://github.com/shreyashkar-ml", external: true }
+      };
+      const helpCommands = [
+        ["@", "about", "read the short intro"],
+        ["◆", "projects", "browse selected projects"],
+        ["✎", "blogs", "open the writing archive"],
+        ["↗", "github", "visit the source profile"],
+        ["×", "clear", "clear this session"]
+      ];
+
+      const renderHelp = () => {
+        const panel = document.createElement("div");
+        panel.className = "terminal-help";
+        const title = document.createElement("p");
+        title.className = "terminal-help-title";
+        title.textContent = "AVAILABLE COMMANDS";
+        panel.appendChild(title);
+        helpCommands.forEach(([icon, command, description]) => {
+          const row = document.createElement("button");
+          row.type = "button";
+          row.className = "terminal-help-row";
+          row.dataset.terminalCommand = command;
+          const iconNode = document.createElement("span");
+          iconNode.className = "terminal-help-icon";
+          iconNode.textContent = icon;
+          const commandNode = document.createElement("strong");
+          commandNode.textContent = command;
+          const descriptionNode = document.createElement("span");
+          descriptionNode.textContent = description;
+          row.append(iconNode, commandNode, descriptionNode);
+          panel.appendChild(row);
+        });
+        return panel;
+      };
+
+      const writeLine = (command) => {
+        const normalized = command.trim().toLowerCase();
+        if (!normalized) return;
+
+        const history = document.createElement("p");
+        history.className = "terminal-history";
+        history.innerHTML = '<span>shreyashkar@portfolio</span>:~$ ';
+        history.append(document.createTextNode(command));
+        output.appendChild(history);
+
+        if (normalized === "clear") {
+          output.replaceChildren();
+        } else if (normalized === "help") {
+          output.appendChild(renderHelp());
+        } else {
+          const result = commands[normalized];
+          const line = document.createElement("p");
+          if (!result) {
+            line.textContent = `${normalized}: command not found. type help.`;
+          } else if (typeof result === "string") {
+            line.textContent = result;
+          } else {
+            line.textContent = result.text;
+            window.setTimeout(() => {
+              if (result.external) window.open(result.href, "_blank", "noopener,noreferrer");
+              else window.location.href = result.href;
+            }, 250);
+          }
+          output.appendChild(line);
+        }
+
+        session.scrollTop = session.scrollHeight;
+      };
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        writeLine(input.value);
+        input.value = "";
+      });
+      terminal.addEventListener("click", (event) => {
+        const shortcut = event.target.closest("[data-terminal-command]");
+        if (shortcut) writeLine(shortcut.dataset.terminalCommand);
+        input.focus();
+      });
+    }
 
     const grid = document.querySelector("[data-contribution-grid]");
     const months = document.querySelector("[data-contribution-months]");

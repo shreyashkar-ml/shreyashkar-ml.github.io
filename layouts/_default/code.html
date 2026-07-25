@@ -1,9 +1,28 @@
 {{- define "main" }}
-<article class="page-shell page-prose">
-  <header class="listing-header">
-    <p class="eyebrow">Selected work</p>
-    <h1>{{ .Title }}</h1>
+<section class="reference-page archive-page code-archive">
+  <header class="archive-header">
+    <p class="archive-eyebrow">Selected work</p>
+    <h1 class="reference-heading">{{ .Title }}</h1>
+    <p>Open-source experiments and tools spanning model training, attention, and privacy.</p>
   </header>
-  <div class="article-content">{{ .Content }}</div>
-</article>
+  {{- $pinned := index site.Data "pinned-projects" }}
+  <div class="code-list">
+    {{- range $pinned.projects }}
+    <article class="code-list-item">
+      <div class="code-list-meta">
+        <span>{{ .language }}</span>
+        <span aria-label="{{ .stars }} GitHub stars">★ {{ .stars }}</span>
+      </div>
+      <h2><a href="{{ .url }}" rel="noopener noreferrer" target="_blank">{{ .name }}</a></h2>
+      <p>{{ .description }}</p>
+      <div class="code-list-links">
+        <a href="{{ .url }}" rel="noopener noreferrer" target="_blank">github <span aria-hidden="true">↗</span></a>
+        {{- with .website }}
+        <a href="{{ . }}" rel="noopener noreferrer" target="_blank">website: {{ replaceRE "^https?://|/$" "" . }} <span aria-hidden="true">↗</span></a>
+        {{- end }}
+      </div>
+    </article>
+    {{- end }}
+  </div>
+</section>
 {{- end }}

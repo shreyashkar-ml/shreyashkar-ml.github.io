@@ -4,6 +4,7 @@
     {
       "name": "autoexp",
       "url": "https://github.com/shreyashkar-ml/autoexp",
+      "website": "https://autoexp.dev",
       "description": "Local-first AI assisted experimentation workspace.",
       "language": "Python",
       "stars": 2,

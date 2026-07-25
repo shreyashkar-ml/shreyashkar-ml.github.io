@@ -24,6 +24,7 @@ const query = `
             name
             description
             url
+            homepageUrl
             stargazerCount
             primaryLanguage { name }
           }
@@ -56,6 +57,7 @@ if (payload.errors?.length) {
 const projects = payload.data?.user?.pinnedItems?.nodes?.filter(Boolean).map((project) => ({
   name: project.name,
   url: project.url,
+  website: project.homepageUrl || undefined,
   description: project.description || "A pinned project from GitHub.",
   language: project.primaryLanguage?.name || "Open source",
   stars: project.stargazerCount,

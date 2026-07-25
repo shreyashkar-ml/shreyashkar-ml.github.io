@@ -1,27 +1,27 @@
 {{- define "main" }}
-<section class="listing-shell">
-  <header class="listing-header">
-    <p class="eyebrow">Writing</p>
-    <h1>{{ .Title }}</h1>
-    {{- with .Description }}<p>{{ . }}</p>{{ end }}
+<section class="reference-page archive-page">
+  <header class="archive-header">
+    <p class="archive-eyebrow">Writing archive</p>
+    <h1 class="reference-heading">{{ .Title }}</h1>
+    <p>Notes on language models, optimization, and the systems behind modern machine learning.</p>
   </header>
 
   {{- if .Content }}
   <div class="listing-content">{{ .Content }}</div>
   {{- end }}
 
-  <div class="writing-list writing-list-page">
+  <div class="reference-writing-list archive-writing-list">
     {{- $pages := .RegularPages }}
     {{- range .Sections }}{{ $pages = $pages | union .RegularPages }}{{ end }}
     {{- range $pages.ByDate.Reverse }}
-    <a class="writing-item" href="{{ .RelPermalink }}">
-      <div class="writing-item-meta">
+    <a class="reference-writing-item archive-writing-item" href="{{ .RelPermalink }}">
+      <div class="reference-writing-meta">
         <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
         <span>{{ .ReadingTime }} min read</span>
       </div>
       <h2>{{ .Title }}</h2>
       <p>{{ .Summary | plainify | htmlUnescape | truncate 220 }}</p>
-      <span class="item-arrow" aria-hidden="true">↗</span>
+      <span class="archive-writing-arrow" aria-hidden="true">↗</span>
     </a>
     {{- end }}
   </div>
