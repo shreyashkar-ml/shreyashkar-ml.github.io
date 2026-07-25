@@ -1,0 +1,38 @@
+{
+  "username": "shreyashkar-ml",
+  "projects": [
+    {
+      "name": "autoexp",
+      "url": "https://github.com/shreyashkar-ml/autoexp",
+      "description": "Local-first AI assisted experimentation workspace.",
+      "language": "Python",
+      "stars": 2,
+      "brandColor": "#ff90e8"
+    },
+    {
+      "name": "TinyFT",
+      "url": "https://github.com/shreyashkar-ml/TinyFT",
+      "description": "TinyFT - Lightweight LLM Fine-Tuning Library.",
+      "language": "Python",
+      "stars": 6,
+      "brandColor": "#ff90e8"
+    },
+    {
+      "name": "native_sparse_attention",
+      "url": "https://github.com/shreyashkar-ml/native_sparse_attention",
+      "description": "Native sparse attention experiments.",
+      "language": "Python",
+      "stars": 3,
+      "brandColor": "#ff90e8"
+    },
+    {
+      "name": "differential_privacy",
+      "url": "https://github.com/shreyashkar-ml/differential_privacy",
+      "description": "Differential privacy training experiments.",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "brandColor": "#ff90e8"
+    }
+  ],
+  "syncedAt": "2026-07-25T00:00:00.000Z"
+}

@@ -10,6 +10,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+  # Refresh GitHub-sourced homepage data daily.
+  schedule:
+    - cron: "17 3 * * *"
+
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
@@ -45,6 +49,14 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Sync pinned GitHub projects
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/sync-pinned-projects.mjs --required
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5

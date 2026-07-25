@@ -1,0 +1,125 @@
+{{- define "main" }}
+<section class="reference-page">
+  <section class="home-intro" aria-labelledby="home-title">
+    <img class="home-avatar" src="https://github.com/shreyashkar-ml.png?size=160" alt="Shreyashkar Lal Sahu" width="84" height="84">
+    <div class="home-intro-copy">
+      <h1 id="home-title" class="display-name"><span id="typewriter-text"></span><span class="typewriter-cursor" aria-hidden="true"></span></h1>
+      <p class="intro-copy">AI engineer and LLM research enthusiast. I work across deep learning, high-performance data engineering, and language model systems.</p>
+    </div>
+  </section>
+
+  <div class="reference-divider"></div>
+
+  <section class="reference-section" aria-labelledby="projects-title">
+    <h2 id="projects-title" class="reference-heading">selected projects</h2>
+    <div class="reference-project-list">
+      {{- $pinned := index site.Data "pinned-projects" }}
+      {{- range $pinned.projects }}
+      <a class="reference-project" href="{{ .url }}" rel="noopener noreferrer" target="_blank">
+        <div class="reference-project-title" style="--brand-color: {{ .brandColor | default "#ff90e8" }};">
+          <span class="reference-project-icon"><img src="https://github.com/{{ $pinned.username }}.png?size=64" alt="" loading="lazy"></span>
+          <span class="reference-project-name"><span>{{ .name }}</span><span class="reference-project-hover">{{ .name }}</span></span>
+          <span aria-hidden="true">↗</span>
+        </div>
+        <div class="reference-project-kind">{{ .language }}</div>
+        <p>{{ .description }}</p>
+        <div class="project-meta"><span>{{ .language }}</span><span aria-label="{{ .stars }} GitHub stars">★ {{ .stars }}</span></div>
+      </a>
+      {{- end }}
+    </div>
+  </section>
+</section>
+
+<section class="reference-page reference-section" aria-labelledby="writing-title">
+  <div class="reference-section-heading">
+    <h2 id="writing-title" class="reference-heading">recent writing</h2>
+    <a class="reference-more" href="{{ "/posts/" | relURL }}">all posts <span aria-hidden="true">↗</span></a>
+  </div>
+  <div class="reference-writing-list">
+    {{- range first 3 (where site.RegularPages "Section" "posts") }}
+    <a class="reference-writing-item" href="{{ .RelPermalink }}">
+      <div class="reference-writing-meta">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+        {{- with .ReadingTime }}<span>{{ . }} min read</span>{{ end }}
+      </div>
+      <h3>{{ .Title }}</h3>
+      <p>{{ .Summary | plainify | htmlUnescape | truncate 180 }}</p>
+    </a>
+    {{- end }}
+  </div>
+</section>
+
+<section class="reference-page reference-section contributions-section" aria-labelledby="contributions-title">
+  <div class="reference-section-heading">
+    <h2 id="contributions-title" class="reference-heading">github contributions</h2>
+    <a class="reference-more" href="https://github.com/shreyashkar-ml" rel="noopener noreferrer" target="_blank">view profile <span aria-hidden="true">↗</span></a>
+  </div>
+  <div class="contributions-widget" data-contributions-widget>
+    <div class="contributions-scroll">
+      <div class="contribution-calendar" role="grid" aria-label="GitHub contribution activity">
+        <div class="contribution-months" data-contribution-months aria-hidden="true"></div>
+        <div class="contribution-grid" data-contribution-grid></div>
+      </div>
+    </div>
+    <div class="contributions-footer">
+      <span data-contribution-total>GitHub activity from the last year</span>
+      <span class="contribution-legend"><span>Less</span><i class="level-0"></i><i class="level-1"></i><i class="level-2"></i><i class="level-3"></i><i class="level-4"></i><span>More</span></span>
+    </div>
+  </div>
+</section>
+<script>
+  (() => {
+    const text = "hey, i'm shreyashkar lal sahu";
+    const target = document.getElementById("typewriter-text");
+    if (target) {
+      [...text].forEach((character, index) => {
+        window.setTimeout(() => { target.textContent += character; }, index * 55);
+      });
+    }
+
+    document.querySelectorAll(".reference-project-title").forEach((project) => {
+      project.addEventListener("pointermove", (event) => {
+        const bounds = project.getBoundingClientRect();
+        project.style.setProperty("--pointer-x", `${event.clientX - bounds.left}px`);
+      });
+    });
+
+    const grid = document.querySelector("[data-contribution-grid]");
+    const months = document.querySelector("[data-contribution-months]");
+    const total = document.querySelector("[data-contribution-total]");
+    if (!grid || !months || !total) return;
+
+    fetch("https://github-contributions-api.jogruber.de/v4/shreyashkar-ml?y=last")
+      .then((response) => response.json())
+      .then((payload) => {
+        const contributions = payload.contributions || [];
+        total.textContent = `${payload.total?.lastYear || 0} contributions in the last year on GitHub.`;
+
+        let previousMonth = "";
+        contributions.forEach((entry, index) => {
+          const date = new Date(`${entry.date}T00:00:00Z`);
+          const column = Math.floor(index / 7);
+          const cell = document.createElement("span");
+          cell.className = `contribution-cell level-${entry.level || 0}`;
+          cell.setAttribute("role", "gridcell");
+          cell.setAttribute("tabindex", "0");
+          cell.setAttribute("aria-label", `${entry.count} contributions on ${date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`);
+          cell.title = `${entry.count} contribution${entry.count === 1 ? "" : "s"} on ${date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+          grid.appendChild(cell);
+
+          const month = date.toLocaleDateString("en-US", { month: "short" });
+          if (month !== previousMonth) {
+            const label = document.createElement("span");
+            label.textContent = month;
+            label.style.gridColumn = `${column + 1} / span 4`;
+            months.appendChild(label);
+            previousMonth = month;
+          }
+        });
+      })
+      .catch(() => {
+        total.innerHTML = '<a href="https://github.com/shreyashkar-ml" target="_blank" rel="noopener noreferrer">View contribution activity on GitHub ↗</a>';
+      });
+  })();
+</script>
+{{- end }}

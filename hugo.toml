@@ -11,7 +11,8 @@ theme = "PaperMod"
   subtitle = "Data Scientist and ML Enthusiast"
 
   # PaperMod specific parameters
-  defaultTheme = "auto"
+  defaultTheme = "dark"
+  disableThemeToggle = true
   ShowReadingTime = true
   ShowShareButtons = true
   ShowPostNavLinks = true
@@ -63,6 +64,11 @@ theme = "PaperMod"
 
 [menu]
   [[menu.main]]
+    identifier = "home"
+    name = "Home"
+    url = "/"
+    weight = 1
+  [[menu.main]]
     identifier = "about"
     name = "About"
     url = "/about/"
@@ -77,4 +83,3 @@ theme = "PaperMod"
     name = "Code"
     url = "/code/"
     weight = 30
-
