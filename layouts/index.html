@@ -119,8 +119,13 @@
         ["@", "about", "read the short intro"],
         ["◆", "projects", "browse selected projects"],
         ["✎", "blogs", "open the writing archive"],
-        ["↗", "github", "visit the source profile"],
+        ["+", "socials", "open social links"],
         ["×", "clear", "clear this session"]
+      ];
+      const socialLinks = [
+        ["↗", "github", "github.com/shreyashkar-ml", "https://github.com/shreyashkar-ml"],
+        ["in", "linkedin", "shreyashkar-sahu", "https://www.linkedin.com/in/shreyashkar-sahu/"],
+        ["x", "twitter", "@ShreyashkarLal", "https://x.com/ShreyashkarLal"]
       ];
 
       const renderHelp = () => {
@@ -148,6 +153,32 @@
         return panel;
       };
 
+      const renderSocials = () => {
+        const panel = document.createElement("div");
+        panel.className = "terminal-help terminal-socials";
+        const title = document.createElement("p");
+        title.className = "terminal-help-title";
+        title.textContent = "SOCIAL LINKS";
+        panel.appendChild(title);
+        socialLinks.forEach(([icon, name, handle, href]) => {
+          const row = document.createElement("a");
+          row.className = "terminal-help-row";
+          row.href = href;
+          row.target = "_blank";
+          row.rel = "noopener noreferrer";
+          const iconNode = document.createElement("span");
+          iconNode.className = "terminal-help-icon";
+          iconNode.textContent = icon;
+          const nameNode = document.createElement("strong");
+          nameNode.textContent = name;
+          const handleNode = document.createElement("span");
+          handleNode.textContent = handle;
+          row.append(iconNode, nameNode, handleNode);
+          panel.appendChild(row);
+        });
+        return panel;
+      };
+
       const writeLine = (command) => {
         const normalized = command.trim().toLowerCase();
         if (!normalized) return;
@@ -162,6 +193,8 @@
           output.replaceChildren();
         } else if (normalized === "help") {
           output.appendChild(renderHelp());
+        } else if (normalized === "socials") {
+          output.appendChild(renderSocials());
         } else {
           const result = commands[normalized];
           const line = document.createElement("p");

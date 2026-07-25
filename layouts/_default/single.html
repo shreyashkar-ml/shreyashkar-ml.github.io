@@ -7,13 +7,16 @@
     <p class="eyebrow">{{ .Section | humanize }}</p>
     <h1 class="article-title">{{ .Title }}</h1>
     {{- with .Description }}<p class="article-description">{{ . }}</p>{{ end }}
-    {{- if not (.Param "hideMeta") }}
-    <div class="article-meta">
-      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
-      <span aria-hidden="true">·</span>
-      <span>{{ .ReadingTime }} min read</span>
+    <div class="article-meta-row">
+      {{- if not (.Param "hideMeta") }}
+      <div class="article-meta">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+        <span aria-hidden="true">·</span>
+        <span>{{ .ReadingTime }} min read</span>
+      </div>
+      {{- end }}
+      {{ partial "share_button.html" (dict "title" .Title "path" .RelPermalink) }}
     </div>
-    {{- end }}
   </header>
 
   {{- if .Param "ShowToc" }}
@@ -40,4 +43,5 @@
     {{- if .Param "ShowPostNavLinks" }}{{ partial "post_nav_links.html" . }}{{ end }}
   </footer>
 </article>
+{{ partial "share_script.html" . }}
 {{- end }}

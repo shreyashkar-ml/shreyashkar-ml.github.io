@@ -14,16 +14,19 @@
     {{- $pages := .RegularPages }}
     {{- range .Sections }}{{ $pages = $pages | union .RegularPages }}{{ end }}
     {{- range $pages.ByDate.Reverse }}
-    <a class="reference-writing-item archive-writing-item" href="{{ .RelPermalink }}">
-      <div class="reference-writing-meta">
-        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
-        <span>{{ .ReadingTime }} min read</span>
-      </div>
-      <h2>{{ .Title }}</h2>
-      <p>{{ .Summary | plainify | htmlUnescape | truncate 220 }}</p>
-      <span class="archive-writing-arrow" aria-hidden="true">↗</span>
-    </a>
+    <article class="reference-writing-item archive-writing-item">
+      <a class="archive-writing-link" href="{{ .RelPermalink }}">
+        <div class="reference-writing-meta">
+          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+          <span>{{ .ReadingTime }} min read</span>
+        </div>
+        <h2>{{ .Title }}</h2>
+        <p>{{ .Summary | plainify | htmlUnescape | truncate 220 }}</p>
+      </a>
+      {{ partial "share_button.html" (dict "title" .Title "path" .RelPermalink "compact" true) }}
+    </article>
     {{- end }}
   </div>
 </section>
+{{ partial "share_script.html" . }}
 {{- end }}

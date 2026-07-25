@@ -33,7 +33,7 @@ theme = "PaperMod"
   # Social icons
   [[params.socialIcons]]
     name = "twitter"
-    url = "https://twitter.com/ShreyashkarLal"
+    url = "https://x.com/ShreyashkarLal"
   [[params.socialIcons]]
     name = "github"
     url = "https://github.com/shreyashkar-ml"

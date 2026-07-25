@@ -12,6 +12,7 @@
   --border: #ded9d6;
   --scrollbar: #aaa3a7;
   --mobile-overlay: rgb(251 250 248 / 95%);
+  --header-bg: rgb(251 250 248 / 78%);
   --theme: var(--page-bg);
   --entry: var(--surface);
   --primary: var(--text);
@@ -41,6 +42,7 @@
   --border: #262626;
   --scrollbar: #333;
   --mobile-overlay: rgb(0 0 0 / 95%);
+  --header-bg: rgb(0 0 0 / 72%);
   --theme: var(--page-bg);
   --entry: var(--surface);
   --primary: var(--text);
@@ -86,17 +88,24 @@ a {
 }
 
 .header {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  left: 0;
   height: auto;
-  border: 0;
-  background: var(--page-bg);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: var(--header-bg);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
 .nav {
   width: 100%;
   max-width: 720px;
   min-height: 0;
-  margin: 48px auto 0;
-  padding: 0;
+  margin: 0 auto;
+  padding: 18px 0;
   line-height: 1;
 }
 
@@ -184,7 +193,7 @@ a {
 .main {
   max-width: calc(var(--main-width) + var(--gap) * 2);
   margin: 0 auto;
-  padding-top: 34px;
+  padding-top: 104px;
   padding-bottom: 80px;
 }
 
@@ -402,6 +411,7 @@ a {
   font: inherit;
   font-size: 11px;
   line-height: 1.4;
+  text-decoration: none;
   text-align: left;
 }
 
@@ -424,6 +434,10 @@ a {
   color: #fff;
   font-weight: 600;
   transition: color 160ms ease;
+}
+
+.terminal-socials {
+  width: min(100%, 480px);
 }
 
 .terminal-status {
@@ -827,7 +841,12 @@ a {
 
 .archive-writing-item {
   position: relative;
-  padding-right: 42px;
+  padding-right: 48px;
+}
+
+.archive-writing-link {
+  display: block;
+  color: inherit;
 }
 
 .archive-writing-item h2 {
@@ -843,20 +862,67 @@ a {
   color: var(--accent);
 }
 
-.archive-writing-arrow {
-  position: absolute;
-  top: 50%;
-  right: 4px;
+.share-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
   color: var(--muted);
-  transform: translate(-5px, -50%);
-  opacity: 0;
-  transition: color 180ms ease, opacity 180ms ease, transform 180ms ease;
+  cursor: pointer;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition: border-color 180ms ease, color 180ms ease, transform 180ms ease;
 }
 
-.archive-writing-item:hover .archive-writing-arrow {
+.share-button:hover,
+.share-button:focus-visible {
+  border-color: var(--accent);
   color: var(--accent);
-  transform: translate(0, -50%);
-  opacity: 1;
+}
+
+.share-button:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.share-button:active {
+  transform: scale(0.96);
+}
+
+.share-button svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.share-button-compact {
+  position: absolute;
+  top: 20px;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.share-button-compact > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .code-list {
@@ -1011,6 +1077,18 @@ a {
   font-size: 11px;
   line-height: 1.4;
   text-transform: uppercase;
+}
+
+.article-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.article-meta-row .article-meta {
+  margin-top: 0;
 }
 
 .breadcrumbs {
@@ -1168,7 +1246,8 @@ a {
 @media screen and (max-width: 640px) {
   .nav {
     width: calc(100% - 32px);
-    margin-top: 40px;
+    margin-top: 0;
+    padding-block: 13px;
   }
 
   .desktop-nav {
@@ -1274,7 +1353,7 @@ a {
   }
 
   .main {
-    padding-top: 24px;
+    padding-top: 88px;
     padding-bottom: 56px;
   }
 
@@ -1388,17 +1467,15 @@ a {
   }
 
   .archive-writing-item {
-    padding-right: 28px;
-  }
-
-  .archive-writing-arrow {
-    right: 0;
-    opacity: 1;
-    transform: translate(0, -50%);
+    padding-right: 44px;
   }
 
   .code-list-links {
     gap: 10px;
+  }
+
+  .article-meta-row {
+    align-items: flex-start;
   }
 
   .contributions-footer {
