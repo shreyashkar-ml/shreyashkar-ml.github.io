@@ -94,6 +94,7 @@ a {
   right: 0;
   left: 0;
   height: auto;
+  padding-top: env(safe-area-inset-top, 0px);
   border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: var(--header-bg);
   backdrop-filter: blur(18px) saturate(140%);
@@ -158,6 +159,7 @@ a {
   letter-spacing: 0.03em;
   cursor: pointer;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .theme-toggle:hover {
@@ -194,13 +196,14 @@ a {
 .main {
   max-width: calc(var(--main-width) + var(--gap) * 2);
   margin: 0 auto;
-  padding-top: 104px;
+  padding-top: calc(104px + env(safe-area-inset-top, 0px));
   padding-bottom: 80px;
 }
 
 .reference-page {
   width: 100%;
   max-width: 960px;
+  min-width: 0;
   margin: 0 auto;
   padding-inline: 16px;
 }
@@ -324,6 +327,7 @@ a {
   flex: 0 0 auto;
   align-items: center;
   gap: 16px;
+  min-width: 0;
   padding: 18px 16px;
   border-bottom: 1px solid #292e42;
 }
@@ -342,8 +346,12 @@ a {
 .home-terminal-banner {
   min-width: 0;
   flex: 1;
+  width: 100%;
+  max-width: 100%;
   margin: 0;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
   padding: 0;
   color: #fff;
   font-family: "IBM Plex Mono", "Geist Mono", ui-monospace, monospace;
@@ -660,6 +668,7 @@ a {
 
 .reference-section-heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
@@ -1027,6 +1036,7 @@ a {
 
 .article-shell {
   max-width: 900px;
+  min-width: 0;
   margin: 0 auto;
 }
 
@@ -1180,8 +1190,17 @@ a {
 }
 
 .article-content .ml-interactive {
+  width: 100%;
   max-width: 100%;
-  overflow-x: auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.article-content .ml-plot {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
 }
 
 .article-footer {
@@ -1259,18 +1278,25 @@ a {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
   }
 
   .mobile-nav-actions {
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
   }
 
   .mobile-brand {
+    min-width: 0;
+    overflow: hidden;
     color: var(--text-muted);
     font-size: 14px;
     font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .menu-button {
@@ -1312,6 +1338,7 @@ a {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
+    overflow-y: auto;
     padding: 32px;
     background: var(--mobile-overlay);
     backdrop-filter: blur(12px);
@@ -1345,6 +1372,7 @@ a {
   }
 
   .mobile-social-links {
+    flex-wrap: wrap;
     margin-top: 42px;
   }
 
@@ -1354,7 +1382,7 @@ a {
   }
 
   .main {
-    padding-top: 88px;
+    padding-top: calc(88px + env(safe-area-inset-top, 0px));
     padding-bottom: 56px;
   }
 
@@ -1447,6 +1475,12 @@ a {
     margin-top: 28px;
   }
 
+  .reference-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .reference-heading {
     font-size: 20px;
   }
@@ -1477,6 +1511,7 @@ a {
 
   .article-meta-row {
     align-items: flex-start;
+    flex-wrap: wrap;
   }
 
   .contributions-footer {
@@ -1493,15 +1528,52 @@ a {
   }
 
   .article-content .ml-controls {
+    display: flex;
     align-items: stretch;
     flex-direction: column;
+    gap: 10px;
   }
 
   .article-content .ml-controls label {
+    display: flex;
+    flex: 1 1 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 8px;
     justify-content: space-between;
   }
 
   .article-content .ml-controls input[type="range"] {
-    width: min(52vw, 180px);
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 0 100%;
+    order: 3;
+  }
+
+  .article-content .ml-controls .ml-readout {
+    order: 2;
+    flex: 0 0 auto;
+  }
+
+  .footer span:last-child {
+    white-space: normal;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .mobile-menu {
+    padding-inline: 24px;
+  }
+
+  .home-terminal-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-terminal-image {
+    width: 64px;
+    height: 72px;
+    flex-basis: 72px;
   }
 }

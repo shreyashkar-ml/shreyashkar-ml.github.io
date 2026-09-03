@@ -1,0 +1,2 @@
+{{- $resource := .Page.Resources.GetMatch .Destination -}}
+<img loading="lazy" src="{{ .Destination | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ with $resource }} width="{{ .Width }}" height="{{ .Height }}"{{ end }} />
