@@ -96,6 +96,15 @@ a {
   height: auto;
   padding-top: env(safe-area-inset-top, 0px);
   border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+/* Blur lives on a pseudo-element: backdrop-filter on .header would make it the
+   containing block of the fixed mobile menu and shrink the overlay to the bar. */
+.header::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
   background: var(--header-bg);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
@@ -1495,6 +1504,10 @@ a {
 
   .reference-project {
     min-height: 220px;
+  }
+
+  .article-shell {
+    padding-inline: 16px;
   }
 
   .archive-header {
